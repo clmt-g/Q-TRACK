@@ -1,18 +1,55 @@
-import {Stack, Tabs} from "expo-router";
-import {Ionicons} from "@expo/vector-icons";
+// app/(tabs)/_layout.tsx
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function RootLayout() {
-  return (
-      <Stack>
+export default function TabsLayout() {
+    const insets = useSafeAreaInsets();
+
+    return (
         <Tabs
             screenOptions={{
-              tabBarActiveTintColor: "#007AFF",
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="settings" size={size} color={color} />
-              ),
+                tabBarActiveTintColor: '#00D9FF',
+                tabBarInactiveTintColor: '#666',
+                headerShown: true,
+                headerStyle: {
+                    backgroundColor: '#131837',
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#1E2347',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                    fontWeight: '700',
+                    fontSize: 18,
+                },
+                tabBarStyle: {
+                    backgroundColor: '#131837',
+                    borderTopWidth: 1,
+                    borderTopColor: '#1E2347',
+                    height: 60 + insets.bottom,
+                    paddingBottom: insets.bottom,
+                    paddingTop: 8,
+                },
+                tabBarLabelStyle: {
+                    fontSize: 11,
+                    fontWeight: '600',
+                    marginTop: 4,
+                },
             }}
-        />
-      </Stack>
-  );
+        >
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: 'Accueil',
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Ionicons
+                            name={focused ? "home" : "home-outline"}
+                            size={size}
+                            color={color}
+                        />
+                    ),
+                }}
+            />
+        </Tabs>
+    );
 }
