@@ -2,16 +2,17 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { globalStyles, colors } from '@/styles/theme';
 
 export default function HomeScreen() {
     const router = useRouter();
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={globalStyles.container}>
             {/* Header Section */}
-            <View style={styles.header}>
-                <Text style={styles.welcomeText}>Bonjour, Clément 👋</Text>
-                <Text style={styles.subtitle}>PharmaSanté - Gestion Qualité</Text>
+            <View style={globalStyles.header}>
+                <Text style={globalStyles.headerTitle}>Bonjour, Clément 👋</Text>
+                <Text style={globalStyles.subtitle}>PharmaSanté - Gestion Qualité</Text>
             </View>
 
             {/* Quick Stats */}
@@ -30,8 +31,8 @@ export default function HomeScreen() {
             </View>
 
             {/* Quick Actions */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Actions rapides</Text>
+            <View style={globalStyles.section}>
+                <Text style={globalStyles.sectionTitle}>Actions rapides</Text>
 
                 <TouchableOpacity
                     style={styles.actionCard}
@@ -41,8 +42,8 @@ export default function HomeScreen() {
                         <Ionicons name="add-circle" size={28} color="#60A5FA" />
                     </View>
                     <View style={styles.actionContent}>
-                        <Text style={styles.actionTitle}>Déclarer un incident</Text>
-                        <Text style={styles.actionDescription}>
+                        <Text style={globalStyles.cardTitle}>Déclarer un incident</Text>
+                        <Text style={globalStyles.cardDescription}>
                             Signaler un problème qualité rapidement
                         </Text>
                     </View>
@@ -57,8 +58,8 @@ export default function HomeScreen() {
                         <Ionicons name="list" size={28} color="#A78BFA" />
                     </View>
                     <View style={styles.actionContent}>
-                        <Text style={styles.actionTitle}>Mes déclarations</Text>
-                        <Text style={styles.actionDescription}>
+                        <Text style={globalStyles.cardTitle}>Mes déclarations</Text>
+                        <Text style={globalStyles.cardDescription}>
                             Consulter l&#39;historique de vos incidents
                         </Text>
                     </View>
@@ -73,8 +74,8 @@ export default function HomeScreen() {
                         <Ionicons name="construct" size={28} color="#FB923C" />
                     </View>
                     <View style={styles.actionContent}>
-                        <Text style={styles.actionTitle}>Actions correctives</Text>
-                        <Text style={styles.actionDescription}>
+                        <Text style={globalStyles.cardTitle}>Actions correctives</Text>
+                        <Text style={globalStyles.cardDescription}>
                             Suivre les mesures en cours
                         </Text>
                     </View>
@@ -83,29 +84,29 @@ export default function HomeScreen() {
             </View>
 
             {/* Recent Incidents */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Incidents récents</Text>
+            <View style={globalStyles.section}>
+                <Text style={globalStyles.sectionTitle}>Incidents récents</Text>
 
                 <View style={styles.incidentCard}>
-                    <View style={styles.incidentHeader}>
+                    <View style={globalStyles.spaceBetween}>
                         <View style={[styles.statusBadge, styles.statusDeclare]}>
                             <Text style={styles.statusText}>Déclaré</Text>
                         </View>
                         <Text style={styles.incidentDate}>Aujourd&#39;hui, 14:30</Text>
                     </View>
-                    <Text style={styles.incidentTitle}>Non-conformité emballage Lot A2345</Text>
-                    <Text style={styles.incidentType}>Type : Défaut emballage</Text>
+                    <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>Non-conformité emballage Lot A2345</Text>
+                    <Text style={globalStyles.cardDescription}>Type : Défaut emballage</Text>
                 </View>
 
                 <View style={styles.incidentCard}>
-                    <View style={styles.incidentHeader}>
+                    <View style={globalStyles.spaceBetween}>
                         <View style={[styles.statusBadge, styles.statusEnCours]}>
                             <Text style={styles.statusText}>En cours</Text>
                         </View>
                         <Text style={styles.incidentDate}>Hier, 10:15</Text>
                     </View>
-                    <Text style={styles.incidentTitle}>Température hors norme Zone 3</Text>
-                    <Text style={styles.incidentType}>Type : Conditions de stockage</Text>
+                    <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>Température hors norme Zone 3</Text>
+                    <Text style={globalStyles.cardDescription}>Type : Conditions de stockage</Text>
                 </View>
             </View>
 
@@ -120,30 +121,8 @@ export default function HomeScreen() {
     );
 }
 
+// Styles spécifiques à cette page uniquement
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#0F172A', // Dark background
-    },
-    header: {
-        backgroundColor: '#1E293B', // Dark header avec gradient subtil
-        padding: 24,
-        paddingTop: 16,
-        paddingBottom: 32,
-        borderBottomWidth: 1,
-        borderBottomColor: '#334155',
-    },
-    welcomeText: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#F1F5F9',
-        marginBottom: 4,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#94A3B8',
-    },
-
     // Stats
     statsContainer: {
         flexDirection: 'row',
@@ -153,12 +132,12 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: '#1E293B',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#334155',
+        borderColor: colors.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
@@ -168,37 +147,26 @@ const styles = StyleSheet.create({
     statNumber: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#F1F5F9',
+        color: colors.text,
         marginTop: 8,
     },
     statLabel: {
         fontSize: 13,
-        color: '#94A3B8',
+        color: colors.textSecondary,
         textAlign: 'center',
         marginTop: 4,
-    },
-
-    // Sections
-    section: {
-        padding: 16,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#F1F5F9',
-        marginBottom: 12,
     },
 
     // Action Cards
     actionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1E293B',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#334155',
+        borderColor: colors.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
@@ -216,38 +184,22 @@ const styles = StyleSheet.create({
     actionContent: {
         flex: 1,
     },
-    actionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#F1F5F9',
-        marginBottom: 2,
-    },
-    actionDescription: {
-        fontSize: 13,
-        color: '#94A3B8',
-    },
 
     // Incident Cards
     incidentCard: {
-        backgroundColor: '#1E293B',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderLeftWidth: 4,
-        borderLeftColor: '#60A5FA',
+        borderLeftColor: colors.primary,
         borderWidth: 1,
-        borderColor: '#334155',
+        borderColor: colors.border,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 3,
         elevation: 3,
-    },
-    incidentHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
     },
     statusBadge: {
         paddingHorizontal: 12,
@@ -267,21 +219,11 @@ const styles = StyleSheet.create({
     statusText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#F1F5F9',
+        color: colors.text,
     },
     incidentDate: {
         fontSize: 12,
-        color: '#64748B',
-    },
-    incidentTitle: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#F1F5F9',
-        marginBottom: 4,
-    },
-    incidentType: {
-        fontSize: 13,
-        color: '#94A3B8',
+        color: colors.textMuted,
     },
 
     // Info Banner
