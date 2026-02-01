@@ -1,18 +1,62 @@
 // app/(tabs)/index.tsx
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/utils/supabase';
 
 export default function HomeScreen() {
     const router = useRouter();
+    const { session } = useAuth();
+
+    const handleLogout = async () => {
+        Alert.alert(
+            'Déconnexion',
+            'Voulez-vous vraiment vous déconnecter ?',
+            [
+                {
+                    text: 'Annuler',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Déconnexion',
+                    style: 'destructive',
+                    onPress: async () => {
+                        await supabase.auth.signOut();
+                        router.replace('/login');
+                    }
+                }
+            ]
+        );
+    };
 
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header Section */}
             <View style={globalStyles.header}>
-                <Text style={globalStyles.headerTitle}>Bonjour, Clément 👋</Text>
-                <Text style={globalStyles.subtitle}>PharmaSanté - Gestion Qualité</Text>
+                <View style={styles.headerContent}>
+                    <View style={styles.headerText}>
+                        <Text style={globalStyles.headerTitle}>Bonjour, Clément</Text>
+                        <Text style={globalStyles.subtitle}>PharmaSanté - Gestion Qualité</Text>
+                    </View>
+
+                    {/* Header Actions */}
+                    <View style={styles.headerActions}>
+                        {/* Bouton Logout */}
+                        <TouchableOpacity
+                            style={styles.headerButton}
+                            onPress={handleLogout}
+                        >
+                            <Ionicons name="log-out-outline" size={28} color="#FF6B6B" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {/* Email de l'utilisateur */}
+                {session?.user?.email && (
+                    <Text style={styles.userEmail}>{session.user.email}</Text>
+                )}
             </View>
 
             {/* Quick Stats */}
@@ -123,6 +167,33 @@ export default function HomeScreen() {
 
 // Styles spécifiques à cette page uniquement
 const styles = StyleSheet.create({
+    // Header
+    headerContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    headerText: {
+        flex: 1,
+    },
+    headerActions: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    headerButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    userEmail: {
+        fontSize: 13,
+        color: colors.textSecondary,
+        marginTop: 8,
+    },
+
     // Stats
     statsContainer: {
         flexDirection: 'row',

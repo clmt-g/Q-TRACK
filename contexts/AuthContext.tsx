@@ -2,11 +2,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {supabase} from "@/utils/supabase";
+import { Session } from '@supabase/supabase-js';
 
 // interface pour le contexte d'authentification
 interface AuthContextType {
     isLoggedIn: boolean;
     isLoading: boolean;
+    session?: Session | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -18,9 +20,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [session, setSession] = useState<Session | null>(null);
 
     useEffect(() => {
         checkAuth(); // vérifier l'état d'authentification au montage
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            setIsLoggedIn(!!session);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const checkAuth = async () => {
@@ -43,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // sauvegarder le token et l'état de connexion
         if (data.session) {
+            setSession(data.session);
             await AsyncStorage.setItem('userToken', data.session.access_token);
             await AsyncStorage.setItem('userEmail', email);
             setIsLoggedIn(true);
@@ -50,13 +61,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = async () => {
+        await supabase.auth.signOut();
         await AsyncStorage.removeItem('userToken');
         await AsyncStorage.removeItem('userEmail');
+        setSession(null);
         setIsLoggedIn(false);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
