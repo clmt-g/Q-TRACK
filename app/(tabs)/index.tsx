@@ -5,10 +5,12 @@ import { useRouter } from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
+import { useProfile } from "@/hooks/useProfile";
 
 export default function HomeScreen() {
     const router = useRouter();
     const { session } = useAuth();
+    const { profile, loading, error } = useProfile(session?.user?.id || '');
 
     const handleLogout = async () => {
         Alert.alert(
@@ -37,7 +39,7 @@ export default function HomeScreen() {
             <View style={globalStyles.header}>
                 <View style={styles.headerContent}>
                     <View style={styles.headerText}>
-                        <Text style={globalStyles.headerTitle}>Bonjour, Clément</Text>
+                        <Text style={globalStyles.headerTitle}>{`Bonjour, ${profile?.nom}`}</Text>
                         <Text style={globalStyles.subtitle}>PharmaSanté - Gestion Qualité</Text>
                     </View>
 
