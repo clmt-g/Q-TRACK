@@ -1,18 +1,73 @@
 // app/login.tsx
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, AppState } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
 import { useState } from 'react';
+import { supabase } from '@/utils/supabase';
+import { useRouter } from 'expo-router';
+
+// Tells Supabase Auth to continuously refresh the session automatically if
+// the app is in the foreground. When this is added, you will continue to receive
+// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
+// if the user's session is terminated. This should only be registered once.
+AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+        supabase.auth.startAutoRefresh()
+    } else {
+        supabase.auth.stopAutoRefresh()
+    }
+})
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    const handleLogin = () => {
-        // Logique de connexion ici
-        console.log('Login:', email, password);
-    };
+    async function signInWithEmail() {
+        if (!email || !password) {
+            Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+            return;
+        }
+
+        setLoading(true);
+        const { error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+        });
+
+        if (error) {
+            Alert.alert('Erreur de connexion', error.message);
+        } else {
+            // Redirection automatique gérée par l'écouteur d'auth dans _layout.tsx
+            router.replace('/(tabs)');
+        }
+        setLoading(false);
+    }
+
+    async function signUpWithEmail() {
+        if (!email || !password) {
+            Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+            return;
+        }
+
+        setLoading(true);
+        const {
+            data: { session },
+            error,
+        } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+        });
+
+        if (error) {
+            Alert.alert('Erreur d\'inscription', error.message);
+        } else if (!session) {
+            Alert.alert('Vérification email', 'Veuillez vérifier votre boîte mail pour confirmer votre inscription !');
+        }
+        setLoading(false);
+    }
 
     return (
         <KeyboardAvoidingView
@@ -45,6 +100,7 @@ export default function LoginScreen() {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoComplete="email"
+                            editable={!loading}
                         />
                     </View>
 
@@ -59,6 +115,7 @@ export default function LoginScreen() {
                             onChangeText={setPassword}
                             secureTextEntry={!showPassword}
                             autoCapitalize="none"
+                            editable={!loading}
                         />
                         <TouchableOpacity
                             onPress={() => setShowPassword(!showPassword)}
@@ -79,10 +136,13 @@ export default function LoginScreen() {
 
                     {/* Login Button */}
                     <TouchableOpacity
-                        style={globalStyles.button}
-                        onPress={handleLogin}
+                        style={[globalStyles.button, loading && { opacity: 0.6 }]}
+                        onPress={signInWithEmail}
+                        disabled={loading}
                     >
-                        <Text style={globalStyles.buttonText}>Se connecter</Text>
+                        <Text style={globalStyles.buttonText}>
+                            {loading ? 'Connexion...' : 'Se connecter'}
+                        </Text>
                     </TouchableOpacity>
 
                     {/* Divider */}
@@ -92,26 +152,23 @@ export default function LoginScreen() {
                         <View style={styles.dividerLine} />
                     </View>
 
-                    {/* Biometric Login */}
-                    <TouchableOpacity style={styles.biometricButton}>
-                        <Ionicons name="finger-print" size={24} color={colors.primary} />
-                        <Text style={styles.biometricText}>Se connecter avec Touch ID</Text>
+                    {/* Sign Up Button */}
+                    <TouchableOpacity
+                        style={[globalStyles.button, globalStyles.buttonSecondary, loading && { opacity: 0.6 }]}
+                        onPress={signUpWithEmail}
+                        disabled={loading}
+                    >
+                        <Text style={globalStyles.buttonText}>
+                            {loading ? 'Inscription...' : 'Créer un compte'}
+                        </Text>
                     </TouchableOpacity>
-                </View>
-
-                {/* Footer */}
-                <View style={styles.footer}>
-                    <Text style={globalStyles.textSecondary}>
-                        Pas encore de compte ?{' '}
-                        <Text style={styles.signupLink}>Créer un compte</Text>
-                    </Text>
                 </View>
 
                 {/* Info Banner */}
                 <View style={styles.infoBanner}>
                     <Ionicons name="shield-checkmark" size={20} color={colors.success} />
                     <Text style={styles.infoBannerText}>
-                        Connexion sécurisée SSL
+                        Connexion sécurisée avec Supabase
                     </Text>
                 </View>
             </View>
@@ -203,34 +260,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         color: colors.textMuted,
         fontSize: 14,
-    },
-
-    // Biometric
-    biometricButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: colors.border,
-        padding: 16,
-        gap: 12,
-    },
-    biometricText: {
-        color: colors.text,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-
-    // Footer
-    footer: {
-        alignItems: 'center',
-        marginTop: 24,
-    },
-    signupLink: {
-        color: colors.primary,
-        fontWeight: '600',
     },
 
     // Info Banner
