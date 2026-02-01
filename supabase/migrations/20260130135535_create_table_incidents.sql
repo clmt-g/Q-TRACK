@@ -24,14 +24,14 @@ ALTER TABLE incidents
 -- POLICIES
 -- ============================================
 
--- SELECT : admin, qualité see all incidents + operator see their incidents
+-- SELECT : admin, qualité and direction see all incidents + operator see their incidents
 CREATE POLICY "select-incidents" ON incidents
     FOR SELECT
     USING (
     EXISTS(SELECT 1
            FROM profiles
            WHERE profiles.id = auth.uid()
-             AND profiles.role IN ('admin', 'qualite'))
+             AND profiles.role IN ('admin', 'qualite', 'direction'))
         OR auth.uid() = id_user
     );
 
@@ -56,7 +56,7 @@ CREATE POLICY "update-incidents" ON incidents
              AND profiles.role IN ('admin', 'qualite'))
     );
 
--- UPDATE : can only update your incidents (and no delete)
+-- UPDATE : can only update your incidents (+ delete against security)
 CREATE POLICY "update-your-incidents" ON incidents
     FOR UPDATE
     USING (auth.uid() = id_user)

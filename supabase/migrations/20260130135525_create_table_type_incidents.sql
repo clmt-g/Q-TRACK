@@ -19,7 +19,7 @@ ALTER TABLE types_incidents ENABLE ROW LEVEL SECURITY;
 -- POLICIES
 -- ============================================
 
--- select/update
+-- SELECT, UPDATE, INSERT, DELETE : admin and qualite only
 CREATE POLICY "mange-types" ON types_incidents
     FOR ALL
     USING (
@@ -31,7 +31,7 @@ CREATE POLICY "mange-types" ON types_incidents
         )
     );
 
--- just select
+-- SELECT : anyone can view types
 CREATE POLICY "view-types" ON types_incidents
     FOR SELECT
     USING (

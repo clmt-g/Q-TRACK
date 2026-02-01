@@ -22,3 +22,36 @@ ALTER TABLE actions_correctives ENABLE ROW LEVEL SECURITY;
 -- POLICIES
 -- ============================================
 
+-- SELECT : admin, qualite can see all actions correctives + operator can see actions correctives related to their incidents
+CREATE POLICY "select-actions_correctives" ON actions_correctives
+    FOR SELECT
+    USING (
+    EXISTS(SELECT 1
+           FROM profiles
+           WHERE profiles.id = auth.uid()
+             AND profiles.role IN ('admin', 'qualite'))
+        OR EXISTS(SELECT 1
+                   FROM incidents
+                   WHERE incidents.id_incident = actions_correctives.id_incident
+                     AND incidents.id_user = auth.uid())
+    );
+
+-- INSERT : admin and qualite can create an action corrective
+CREATE POLICY "insert-actions_correctives" ON actions_correctives
+    FOR INSERT
+    WITH CHECK (
+    EXISTS(SELECT 1
+           FROM profiles
+           WHERE profiles.id = auth.uid()
+             AND profiles.role IN ('admin', 'qualite'))
+    );
+
+-- UPDATE (and delete) : admin and qualite can update any actions correctives
+CREATE POLICY "update-actions_correctives" ON actions_correctives
+    FOR UPDATE
+    USING (
+    EXISTS(SELECT 1
+           FROM profiles
+           WHERE profiles.id = auth.uid()
+             AND profiles.role IN ('admin', 'qualite'))
+    );

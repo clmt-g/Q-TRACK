@@ -20,7 +20,7 @@ ALTER TABLE profiles
 -- POLICIES
 -- ============================================
 
--- manage all the users
+-- SELECT, INSERT, UPDATE, DELETE profiles by admin only
 CREATE POLICY "manage-profiles" ON profiles
     FOR ALL
     USING (
@@ -30,11 +30,8 @@ CREATE POLICY "manage-profiles" ON profiles
               AND profiles.role = 'admin')
     );
 
--- see user detail
+-- SELECT, UPDATE your own profile (+ make sure a user can't delete his profile)
 CREATE POLICY "manage-your-profile" ON profiles
     FOR ALL
-    USING( auth.uid() = id );
-
-
-
-
+    USING (auth.uid() = id AND deleted_at IS NULL)
+    WITH CHECK (auth.uid() = id AND deleted_at IS NULL);
