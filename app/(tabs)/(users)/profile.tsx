@@ -1,14 +1,25 @@
 // app/(tabs)/profile.tsx
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
+import {useProfile} from "@/hooks/useProfile";
+import {useEffect} from "react";
+import ErrorState from "@/components/error";
+import LoadingState from "@/components/loading";
 
 export default function ProfileScreen() {
     const router = useRouter();
     const { session } = useAuth();
+    const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
+
+    useEffect(() => {
+        loadProfile();
+    }, []);
+
 
     const handleLogout = async () => {
         Alert.alert(
@@ -31,6 +42,16 @@ export default function ProfileScreen() {
         );
     };
 
+    // Afficher le loading
+    if (loading) {
+        return <LoadingState message="Chargement du profil..." />;
+    }
+
+    // Afficher l'erreur
+    if (error) {
+        return <ErrorState error={error} onRetry={loadProfile} />;
+    }
+
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header */}
@@ -44,7 +65,7 @@ export default function ProfileScreen() {
                 <View style={styles.avatarContainer}>
                     <Ionicons name="person-circle" size={80} color={colors.primary} />
                 </View>
-                <Text style={styles.userName}>Clément</Text>
+                <Text style={styles.userName}>{`${profile?.nom} ${profile?.prenom}`}</Text>
                 <Text style={styles.userEmail}>{session?.user?.email || 'Non connecté'}</Text>
             </View>
 
@@ -54,22 +75,22 @@ export default function ProfileScreen() {
 
                 <View style={styles.infoCard}>
                     <View style={styles.infoRow}>
-                        <Ionicons name="mail-outline" size={20} color={colors.textSecondary} />
-                        <View style={styles.infoContent}>
-                            <Text style={styles.infoLabel}>Email</Text>
-                            <Text style={styles.infoValue}>{session?.user?.email}</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
                         <Ionicons name="shield-checkmark-outline" size={20} color={colors.textSecondary} />
                         <View style={styles.infoContent}>
                             <Text style={styles.infoLabel}>ID Utilisateur</Text>
                             <Text style={styles.infoValue} numberOfLines={1}>
                                 {session?.user?.id?.substring(0, 20)}...
                             </Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.divider} />
+
+                    <View style={styles.infoRow}>
+                        <Ionicons name="mail-outline" size={20} color={colors.textSecondary} />
+                        <View style={styles.infoContent}>
+                            <Text style={styles.infoLabel}>Email</Text>
+                            <Text style={styles.infoValue}>{session?.user?.email}</Text>
                         </View>
                     </View>
 
@@ -100,15 +121,16 @@ export default function ProfileScreen() {
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
                 </TouchableOpacity>
 
+
                 <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="notifications-outline" size={24} color={colors.primary} />
-                    <Text style={styles.actionButtonText}>Notifications</Text>
+                    <MaterialIcons name="update" size={24} color={colors.primary} />
+                    <Text style={styles.actionButtonText}>Modifier le profil</Text>
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
-                    <Text style={styles.actionButtonText}>Aide et support</Text>
+                    <Ionicons name="notifications-outline" size={24} color={colors.primary} />
+                    <Text style={styles.actionButtonText}>Notifications</Text>
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
                 </TouchableOpacity>
             </View>

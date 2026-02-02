@@ -33,6 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe();
     }, []);
 
+    /**
+     * check authentication status
+     */
     const checkAuth = async () => {
         try {
             const token = await AsyncStorage.getItem('userToken');
@@ -44,6 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    /**
+     * login function
+     * @param email
+     * @param password
+     */
     const login = async (email: string, password: string) => {
         // Appeler API
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -60,6 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    /**
+     * logout function
+     */
     const logout = async () => {
         await supabase.auth.signOut();
         await AsyncStorage.removeItem('userToken');

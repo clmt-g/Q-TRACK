@@ -16,7 +16,7 @@ class ProfileService {
      * @param userId
      * @return Profile
      */
-    async getProfile(userId: string): Promise<Profile | null> {
+    async getProfile(userId: string | undefined): Promise<Profile | null> {
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
@@ -48,7 +48,7 @@ class ProfileService {
         return data || [];
     }
 
-    // TODO : finish the DAO
+    // TODO : add updateProfile, deleteProfile, createProfile and countProfiles methods
 }
 
 export const profileService = new ProfileService();

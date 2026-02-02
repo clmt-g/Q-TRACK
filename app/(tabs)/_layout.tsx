@@ -2,6 +2,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function TabsLayout() {
     const insets = useSafeAreaInsets();
@@ -60,6 +61,15 @@ export default function TabsLayout() {
                             size={size}
                             color={color}
                         />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="(users)/profiles"
+                options={{
+                    title: 'Profil',
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Feather name="users" size={size} color={color} />
                     ),
                 }}
             />

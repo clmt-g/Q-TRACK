@@ -6,11 +6,13 @@ import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import { useProfile } from "@/hooks/useProfile";
+import ErrorState from "@/components/error";
+import LoadingState from "@/components/loading";
 
 export default function HomeScreen() {
     const router = useRouter();
     const { session } = useAuth();
-    const { profile, loading, error } = useProfile(session?.user?.id || '');
+    const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
 
     const handleLogout = async () => {
         Alert.alert(
@@ -32,6 +34,16 @@ export default function HomeScreen() {
             ]
         );
     };
+
+    // Afficher le loading
+    if (loading) {
+        return <LoadingState message="Chargement du profil..." />;
+    }
+
+    // Afficher l'erreur
+    if (error) {
+        return <ErrorState error={error} onRetry={loadProfile} />;
+    }
 
     return (
         <ScrollView style={globalStyles.container}>
