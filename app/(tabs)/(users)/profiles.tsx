@@ -3,8 +3,8 @@ import {View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator}
 import {Ionicons} from '@expo/vector-icons';
 import {globalStyles, colors} from '@/styles/theme';
 import {useProfile} from "@/hooks/useProfile";
-import {useEffect} from 'react';
-import {useRouter} from "expo-router";
+import {useCallback, useEffect} from 'react';
+import {useFocusEffect, useRouter} from "expo-router";
 import {useAuth} from "@/contexts/AuthContext";
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
@@ -15,9 +15,11 @@ export default function ProfilesScreen() {
     const {session} = useAuth();
     const {profiles, loading, error, loadProfiles} = useProfile(session?.user?.id);
 
-    useEffect(() => {
-        loadProfiles();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadProfiles();
+        }, [])
+    );
 
     // Fonction pour formater la date
     const formatDate = (dateString: string) => {
@@ -126,7 +128,15 @@ export default function ProfilesScreen() {
 
             {/* Profiles List */}
             <View style={globalStyles.section}>
-                <Text style={globalStyles.sectionTitle}>Liste des utilisateurs</Text>
+                <View style={styles.sectionHeader}>
+                    <Text style={globalStyles.sectionTitle}>Liste des utilisateurs</Text>
+                    <TouchableOpacity
+                        style={styles.addButton}
+                        onPress={() => router.push('/users/create')}
+                    >
+                        <Ionicons name="person-add" size={20} color="#fff"/>
+                    </TouchableOpacity>
+                </View>
 
                 {profiles.map((profile) => (
                     <View key={profile.id} style={styles.profileCard}>
@@ -396,5 +406,24 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         color: '#BFDBFE',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16, // Pour garder l'espacement avec le contenu en dessous
+    },
+    addButton: {
+        backgroundColor: colors.primary,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: colors.primary,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
     },
 });

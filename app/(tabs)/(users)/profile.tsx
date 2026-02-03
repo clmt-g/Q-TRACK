@@ -2,12 +2,12 @@
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router';
+import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import {useProfile} from "@/hooks/useProfile";
-import {useEffect} from "react";
+import {useCallback, useEffect} from "react";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
 
@@ -16,9 +16,11 @@ export default function ProfileScreen() {
     const { session } = useAuth();
     const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
 
-    useEffect(() => {
-        loadProfile();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadProfile();
+        }, [])
+    );
 
 
     const handleLogout = async () => {
@@ -122,7 +124,10 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
 
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => router.push(`/users/${profile?.id}/update` as any)}
+                >
                     <MaterialIcons name="update" size={24} color={colors.primary} />
                     <Text style={styles.actionButtonText}>Modifier le profil</Text>
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />

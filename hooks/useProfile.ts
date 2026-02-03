@@ -43,6 +43,50 @@ export function useProfile(userId: string | undefined) {
         }
     };
 
+    const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'updated_at'>>) => {
+        // validation
+        if (!userId || userId === '') {
+            setError('User Id manquant');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await profileService.updateProfile(userId, updates);
+            setProfile(data);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
+            console.error('Error loading profile:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createProfile = async (profileData: {
+        email: string;
+        password: string;
+        nom: string;
+        prenom: string;
+        role: 'operateur' | 'qualite' | 'admin' | 'direction';
+    })=> {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await profileService.createProfile(profileData);
+            setProfile(data);
+            return data;
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     /**
      * load all profiles from the API
      */
@@ -64,5 +108,5 @@ export function useProfile(userId: string | undefined) {
 
     // TODO : complete as you do the ProfileService
 
-    return { profile, loadProfile, profiles, loadProfiles, loading, error };
+    return { profile, loadProfile, updateProfile, createProfile, profiles, loadProfiles, loading, error };
 }

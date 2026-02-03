@@ -1,18 +1,25 @@
 // app/(tabs)/index.tsx
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import { useProfile } from "@/hooks/useProfile";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
+import {useCallback} from "react";
 
 export default function HomeScreen() {
     const router = useRouter();
     const { session } = useAuth();
     const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadProfile();
+        }, [])
+    );
 
     const handleLogout = async () => {
         Alert.alert(
