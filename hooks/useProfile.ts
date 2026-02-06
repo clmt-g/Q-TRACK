@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { profileService, Profile } from '@/services/ProfileService';
+import {Alert} from "react-native";
 
 /**
  *
@@ -43,6 +44,10 @@ export function useProfile(userId: string | undefined) {
         }
     };
 
+    /**
+     * update the profile with the API and return the updated profile
+     * @param updates
+     */
     const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'updated_at'>>) => {
         // validation
         if (!userId || userId === '') {
@@ -65,6 +70,10 @@ export function useProfile(userId: string | undefined) {
         }
     };
 
+    /**
+     * create a profile with the API and return the created profile
+     * @param profileData
+     */
     const createProfile = async (profileData: {
         email: string;
         password: string;
@@ -82,6 +91,30 @@ export function useProfile(userId: string | undefined) {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    /**
+     * soft delete a profile with the API and return the deleted profile
+     * @param profileId
+     */
+    const deleteProfile = async (profileId: string) => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await profileService.deleteProfile(profileId);
+
+            await loadProfiles();
+
+            Alert.alert('Succès', 'Le compte a été supprimé avec succès');
+            return data;
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
+            Alert.alert('Erreur', 'Impossible de supprimer le compte');
+            throw err; // Important pour que l'erreur soit capturée dans handleDelete
         } finally {
             setLoading(false);
         }
@@ -106,7 +139,5 @@ export function useProfile(userId: string | undefined) {
         }
     };
 
-    // TODO : complete as you do the ProfileService
-
-    return { profile, loadProfile, updateProfile, createProfile, profiles, loadProfiles, loading, error };
+    return { profile, loadProfile, updateProfile, createProfile, deleteProfile, profiles, loadProfiles, loading, error };
 }

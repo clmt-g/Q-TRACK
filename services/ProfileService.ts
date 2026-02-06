@@ -1,5 +1,5 @@
-import { supabase } from "@/utils/supabase";
 import {List} from "postcss/lib/list";
+import { supabase, supabaseUrl, supabaseAnonKey } from '@/utils/supabase';
 
 export interface Profile {
     id: string;
@@ -21,6 +21,7 @@ class ProfileService {
             .from('profiles')
             .select('*')
             .eq('id', userId)
+            .is('deleted_at', null)
             .single();
 
         if (error) {
@@ -41,6 +42,7 @@ class ProfileService {
             .from('profiles')
             .update(updates)
             .eq('id', userId)
+            .is('deleted_at', null)
             .select()
             .single();
 
@@ -65,57 +67,56 @@ class ProfileService {
             role: 'operateur' | 'qualite' | 'admin' | 'direction';
         }
     ): Promise<Profile | null> {
-        // recup la session pour s'authentifié
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!session) {
-            throw new Error('Vous devez être connecté pour créer un utilisateur');
-        }
-
-        // Utiliser l'Edge Function au lieu de signUp
-        // on utilise fetch car supabase.functions.invoke ne fonctionne pas en native
-        const response = await fetch(
-            'https://nrqkknpovbmnlwnbfgdi.supabase.co/functions/v1/create-user',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycWtrbnBvdmJtbmx3bmJmZ2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTg4NzcsImV4cCI6MjA4NTI3NDg3N30.ATKkki8K7167hVAP261W9ha0uU3b959yXe8LS9jbh0w',
-                    'Authorization': `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({
-                    email: profileData.email,
-                    password: profileData.password,
+        // Créer l'utilisateur Auth (avec trigger qui crée le profil)
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: profileData.email,
+            password: profileData.password,
+            options: {
+                data: {
                     nom: profileData.nom,
                     prenom: profileData.prenom,
-                    role: profileData.role,
-                    userToken: session.access_token,
-                }),
+                    role: profileData.role
+                }
             }
-        );
+        });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || `Erreur ${response.status}`);
+        if (authError || !authData.user) {
+            console.error('Error creating user:', authError);
+            return null;
         }
 
-        if (!result.user) {
-            throw new Error('Aucun utilisateur retourné');
-        }
-
-        // Récupérer le profil créé par le trigger
+        // Récupérer le profil qui vient d'être créé par le trigger
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', result.user.id)
+            .eq('id', authData.user.id)
             .single();
 
         if (profileError) {
-            throw new Error('Erreur lors de la récupération du profil');
+            console.error('Error fetching created profile:', profileError);
+            return null;
         }
 
         return profile;
+    }
+
+    /**
+     * Soft delete a profile according to the key userId
+     * @param userId
+     */
+    async deleteProfile(userId: string | undefined): Promise<Profile | null> {
+        const { data, error } = await supabase
+            .from('profiles')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', userId)
+            .select()
+            .single();
+
+        if(error) {
+            console.error('Error deleting profile:', error);
+        }
+
+        return data;
     }
 
     /**
@@ -125,7 +126,9 @@ class ProfileService {
     async getAllProfiles(): Promise<Profile[]> {
         const { data, error } = await supabase
             .from('profiles')
-            .select('*');
+            .select('*')
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching profiles:', error);
@@ -135,7 +138,6 @@ class ProfileService {
         return data || [];
     }
 
-    // TODO : add updateProfile, deleteProfile, createProfile and countProfiles methods
 }
 
 export const profileService = new ProfileService();

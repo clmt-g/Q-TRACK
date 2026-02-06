@@ -1,5 +1,5 @@
 // app/(tabs)/profiles.tsx
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {globalStyles, colors} from '@/styles/theme';
 import {useProfile} from "@/hooks/useProfile";
@@ -9,11 +9,12 @@ import {useAuth} from "@/contexts/AuthContext";
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import {supabase} from "@/utils/supabase";
 
 export default function ProfilesScreen() {
     const router = useRouter();
     const {session} = useAuth();
-    const {profiles, loading, error, loadProfiles} = useProfile(session?.user?.id);
+    const {profiles, loading, error, loadProfiles, deleteProfile} = useProfile(session?.user?.id);
 
     useFocusEffect(
         useCallback(() => {
@@ -79,6 +80,30 @@ export default function ProfilesScreen() {
             default:
                 return 'person';
         }
+    };
+
+    const handleDelete = async (userId: string) => {
+        Alert.alert(
+            'Suppression de compte',
+            'Voulez-vous vraiment supprimer ce compte ?',
+            [
+                {
+                    text: 'Annuler',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Supprimer',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await deleteProfile(userId);
+                        } catch (err) {
+                            console.error('Erreur lors de la suppression:', err);
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     // Afficher le loading
@@ -189,7 +214,7 @@ export default function ProfilesScreen() {
 
                             <TouchableOpacity
                                 style={styles.actionButton}
-                                onPress={() => router.push(`/users/${profile.id}/delete` as any)}
+                                onPress={() => handleDelete(profile.id)}
                             >
                                 <MaterialIcons name="delete-outline" size={18} color="#C32D2D"/>
                                 <Text style={styles.actionButtonText}>Supprimer</Text>
