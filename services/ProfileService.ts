@@ -120,6 +120,70 @@ class ProfileService {
     }
 
     /**
+     * update the password of a user in auth and return the updated profile
+     * @param userId
+     * @param newPassword
+     */
+    async updateUserPassword(userId: string, newPassword: string): Promise<Profile | null> {
+        // Utiliser l'Admin API
+        const { data: authData, error: authError } = await supabase.auth.admin.updateUserById(
+            userId,
+            { password: newPassword }
+        );
+
+        if (authError || !authData.user) {
+            console.error('Error updating password:', authError);
+            throw new Error(authError?.message || 'Impossible de mettre à jour le mot de passe');
+        }
+
+        // Récupérer le profil mis à jour
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .is('deleted_at', null)
+            .single();
+
+        if (profileError) {
+            console.error('Error fetching updated profile:', profileError);
+            throw new Error('Profil introuvable');
+        }
+
+        return profile;
+    }
+
+    /**
+     * update the password of a user in auth and return the updated profile
+     * @param userId
+     * @param newPassword
+     */
+    async updatePassword(userId: string, newPassword: string): Promise<Profile | null> {
+        // Mettre à jour le mot de passe de l'utilisateur Auth
+        const { data: authData, error: authError } = await supabase.auth.updateUser({
+            password: newPassword
+        });
+
+        if (authError || !authData.user) {
+            console.error('Error updating password:', authError);
+            return null;
+        }
+
+        // Récupérer le profil mis à jour
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        if (profileError) {
+            console.error('Error fetching updated profile:', profileError);
+            return null;
+        }
+
+        return profile;
+    }
+
+    /**
      * get all profiles
      * @return Profile[]
      */
