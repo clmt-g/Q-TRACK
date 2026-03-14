@@ -1,4 +1,4 @@
-// app/(tabs)/profile.tsx
+// app/(tabs)/profil.tsx
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -117,7 +117,10 @@ export default function ProfileScreen() {
             <View style={globalStyles.section}>
                 <Text style={globalStyles.sectionTitle}>Actions</Text>
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => router.push(`/users/${profile?.id}/update-password` as any)}
+                >
                     <Ionicons name="key-outline" size={24} color={colors.primary} />
                     <Text style={styles.actionButtonText}>Changer le mot de passe</Text>
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />

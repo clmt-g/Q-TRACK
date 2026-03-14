@@ -122,8 +122,8 @@ export function useProfile(userId: string | undefined) {
 
     /** For admins
      * Update a user password with the API and returns the updated profiles
-     * @param userId
-     * @param newPassword
+     * @param userId - the id of the user
+     * @param newPassword - the new password typed by the admin
      */
     const updateUserPassword = async (userId: string, newPassword: string) => {
         try {
@@ -139,17 +139,19 @@ export function useProfile(userId: string | undefined) {
         }
     }
 
-    /** For users
-     * Update a user password with the API and returns the updated profiles
-     * @param userId
-     * @param newPassword
+    /** For users looking to update their own password
+     * update the password of a user in auth and return the updated profile
+     * @param userId - the id of the profile
+     * @param email - the email address of the user
+     * @param oldPassword - the old password of the user
+     * @param newPassword - the new password of the user
      */
-    const updatePassword = async (userId: string, newPassword: string) => {
+    const updatePassword = async (userId: string, email: string, oldPassword: string, newPassword: string) => {
         try {
             setLoading(true);
             setError(null);
 
-            return await profileService.updatePassword(userId, newPassword);
+            return await profileService.updatePassword(userId, email, oldPassword, newPassword);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
@@ -177,5 +179,5 @@ export function useProfile(userId: string | undefined) {
         }
     };
 
-    return { profile, loadProfile, updateProfile, createProfile, deleteProfile, profiles, loadProfiles, loading, error };
+    return { profile, loadProfile, updateProfile, createProfile, deleteProfile, profiles, loadProfiles, updatePassword, updateUserPassword, loading, error };
 }

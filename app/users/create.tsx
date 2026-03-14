@@ -1,4 +1,3 @@
-// app/users/create.tsx
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +7,7 @@ import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
+import PasswordInput, { isPasswordValid } from '@/components/passwordInput';
 
 // Config pour les rôles disponibles
 const ROLES = [
@@ -21,7 +21,6 @@ export default function ProfileCreateScreen() {
     const router = useRouter();
     const { createProfile, loading, error } = useProfile(undefined);
 
-    // États locaux pour les champs du formulaire
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,13 +28,10 @@ export default function ProfileCreateScreen() {
     const [prenom, setPrenom] = useState('');
     const [role, setRole] = useState<'operateur' | 'qualite' | 'admin' | 'direction'>('operateur');
     const [isSaving, setIsSaving] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const insets = useSafeAreaInsets();
 
     const handleCreate = async () => {
-        // Validation
         if (!email.trim() || !password.trim() || !nom.trim() || !prenom.trim()) {
             Alert.alert('Erreur', 'Tous les champs sont obligatoires');
             return;
@@ -46,14 +42,8 @@ export default function ProfileCreateScreen() {
             return;
         }
 
-        if (
-            password.length < 12 ||
-            !/[0-9]/.test(password) ||
-            !/[A-Z]/.test(password) ||
-            !/[a-z]/.test(password) ||
-            !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
-        ) {
-            Alert.alert('Erreur', 'Le mot de passe doit être plus robuste ');
+        if (!isPasswordValid(password)) {
+            Alert.alert('Erreur', 'Le mot de passe doit être plus robuste');
             return;
         }
 
@@ -76,7 +66,7 @@ export default function ProfileCreateScreen() {
                 'Utilisateur créé avec succès',
                 [{
                     text: 'OK',
-                    onPress: () => router.push('/profiles')
+                    onPress: () => router.push('/profils')
                 }]
             );
         }
@@ -138,11 +128,10 @@ export default function ProfileCreateScreen() {
                 <Text style={styles.previewText}>Aperçu</Text>
             </View>
 
-            {/* Formulaire - Informations personnelles */}
+            {/* Informations personnelles */}
             <View style={globalStyles.section}>
                 <Text style={styles.sectionTitle}>Informations personnelles</Text>
 
-                {/* Prénom */}
                 <View style={styles.inputContainer}>
                     <View style={styles.inputIconContainer}>
                         <Ionicons name="person-outline" size={20} color={colors.primary} />
@@ -160,7 +149,6 @@ export default function ProfileCreateScreen() {
                     </View>
                 </View>
 
-                {/* Nom */}
                 <View style={styles.inputContainer}>
                     <View style={styles.inputIconContainer}>
                         <Ionicons name="person-outline" size={20} color={colors.primary} />
@@ -179,11 +167,10 @@ export default function ProfileCreateScreen() {
                 </View>
             </View>
 
-            {/* Formulaire - Informations de connexion */}
+            {/* Informations de connexion */}
             <View style={globalStyles.section}>
                 <Text style={styles.sectionTitle}>Informations de connexion</Text>
 
-                {/* Email */}
                 <View style={styles.inputContainer}>
                     <View style={styles.inputIconContainer}>
                         <Ionicons name="mail-outline" size={20} color={colors.primary} />
@@ -203,69 +190,20 @@ export default function ProfileCreateScreen() {
                     </View>
                 </View>
 
-                {/* Mot de passe */}
-                <View style={styles.inputContainer}>
-                    <View style={styles.inputIconContainer}>
-                        <Ionicons name="lock-closed-outline" size={20} color={colors.primary} />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.inputLabel}>Mot de passe * (min. 6 caractères)</Text>
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={[styles.input, styles.passwordInput]}
-                                value={password}
-                                onChangeText={setPassword}
-                                placeholder="••••••••"
-                                placeholderTextColor={colors.textMuted}
-                                secureTextEntry={!showPassword}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                            <TouchableOpacity
-                                onPress={() => setShowPassword(!showPassword)}
-                                style={styles.eyeIcon}
-                            >
-                                <Ionicons
-                                    name={showPassword ? "eye-outline" : "eye-off-outline"}
-                                    size={20}
-                                    color={colors.textMuted}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+                <PasswordInput
+                    label="Mot de passe"
+                    value={password}
+                    onChangeText={setPassword}
+                    showStrengthIndicator
+                    required
+                />
 
-                {/* Confirmation mot de passe */}
-                <View style={styles.inputContainer}>
-                    <View style={styles.inputIconContainer}>
-                        <Ionicons name="lock-closed-outline" size={20} color={colors.primary} />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.inputLabel}>Confirmer le mot de passe *</Text>
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={[styles.input, styles.passwordInput]}
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                                placeholder="••••••••"
-                                placeholderTextColor={colors.textMuted}
-                                secureTextEntry={!showConfirmPassword}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                            <TouchableOpacity
-                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                                style={styles.eyeIcon}
-                            >
-                                <Ionicons
-                                    name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                                    size={20}
-                                    color={colors.textMuted}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+                <PasswordInput
+                    label="Confirmer le mot de passe"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    required
+                />
 
                 {/* Indicateur de correspondance */}
                 {confirmPassword.length > 0 && (
@@ -404,16 +342,6 @@ const styles = StyleSheet.create({
         color: colors.text,
         fontWeight: '500',
         padding: 0,
-    },
-    passwordContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    passwordInput: {
-        flex: 1,
-    },
-    eyeIcon: {
-        padding: 4,
     },
     passwordMatch: {
         flexDirection: 'row',

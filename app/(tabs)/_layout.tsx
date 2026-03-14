@@ -52,7 +52,7 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="(users)/profile"
+                name="(users)/profil"
                 options={{
                     title: 'Profil',
                     tabBarIcon: ({ color, size, focused }) => (
@@ -65,9 +65,9 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="(users)/profiles"
+                name="(users)/profils"
                 options={{
-                    title: 'Profil',
+                    title: 'Profils',
                     tabBarIcon: ({ color, size, focused }) => (
                         <Feather name="users" size={size} color={color} />
                     ),

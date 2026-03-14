@@ -67,6 +67,7 @@ class ProfileService {
             role: 'operateur' | 'qualite' | 'admin' | 'direction';
         }
     ): Promise<Profile | null> {
+        // FIXME : auth.SignUp authenticate the user as the one newly created
         // Créer l'utilisateur Auth (avec trigger qui crée le profil)
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: profileData.email,
@@ -121,10 +122,11 @@ class ProfileService {
 
     /** For admins looking a user password
      * Update the password of a user in auth and return the updated profile
-     * @param userId
-     * @param newPassword
+     * @param userId - the id of the user (works because the field id of profile is a foreign key of auth.user uid)
+     * @param newPassword - the new password setted by the admin
      */
     async updateUserPassword(userId: string, newPassword: string): Promise<Profile | null> {
+        // FIXME : doesn't work because auth.admin necessitate the service_role key
         // Utiliser l'Admin API
         const { data: authData, error: authError } = await supabase.auth.admin.updateUserById(
             userId,
@@ -154,10 +156,25 @@ class ProfileService {
 
     /** For users looking to update their own password
      * update the password of a user in auth and return the updated profile
-     * @param userId
-     * @param newPassword
+     * @param userId - the id of the profile
+     * @param email - the email address of the user
+     * @param oldPassword - the old password of the user
+     * @param newPassword - the new password of the user
      */
-    async updatePassword(userId: string, newPassword: string): Promise<Profile | null> {
+    async updatePassword(userId: string, email: string, oldPassword: string, newPassword: string): Promise<Profile | null> {
+        // On vérifie que le mot de passe communiqué par l'utilisateur est le bon
+        // si signInWithPassword return une erreur alors c'est pas les cas
+        const { error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: oldPassword
+        })
+
+        if (error) {
+            console.error('The current password provided is invalid:', error);
+            return null;
+        }
+
+        // Si on arrive ici l'utilisateur connait son mot de passe
         // Mettre à jour le mot de passe de l'utilisateur Auth
         const { data: authData, error: authError } = await supabase.auth.updateUser({
             password: newPassword

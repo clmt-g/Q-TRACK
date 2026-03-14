@@ -1,4 +1,4 @@
-// app/(tabs)/profiles.tsx
+// app/(tabs)/profils.tsx
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {globalStyles, colors} from '@/styles/theme';
@@ -214,6 +214,14 @@ export default function ProfilesScreen() {
 
                             <TouchableOpacity
                                 style={styles.actionButton}
+                                onPress={() => router.push(`/users/${profile.id}/update-password` as any)}
+                            >
+                                <Ionicons name="key-outline" size={18} color="#10b981"/>
+                                <Text style={styles.actionButtonText}>Mot de passe</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.actionButton}
                                 onPress={() => handleDelete(profile.id)}
                             >
                                 <MaterialIcons name="delete-outline" size={18} color="#C32D2D"/>
@@ -380,6 +388,7 @@ const styles = StyleSheet.create({
     // Actions
     actionsContainer: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         marginTop: 12,
         gap: 8,
         paddingTop: 12,
@@ -387,7 +396,6 @@ const styles = StyleSheet.create({
         borderTopColor: colors.border,
     },
     actionButton: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -396,6 +404,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 8,
         gap: 6,
+        minWidth: '45%',
+        flex: 1,
     },
     actionButtonText: {
         fontSize: 13,
