@@ -119,8 +119,8 @@ class ProfileService {
         return data;
     }
 
-    /**
-     * update the password of a user in auth and return the updated profile
+    /** For admins looking a user password
+     * Update the password of a user in auth and return the updated profile
      * @param userId
      * @param newPassword
      */
@@ -152,7 +152,7 @@ class ProfileService {
         return profile;
     }
 
-    /**
+    /** For users looking to update their own password
      * update the password of a user in auth and return the updated profile
      * @param userId
      * @param newPassword

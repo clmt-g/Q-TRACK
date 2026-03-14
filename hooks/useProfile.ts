@@ -114,7 +114,45 @@ export function useProfile(userId: string | undefined) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
             Alert.alert('Erreur', 'Impossible de supprimer le compte');
-            throw err; // Important pour que l'erreur soit capturée dans handleDelete
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    /** For admins
+     * Update a user password with the API and returns the updated profiles
+     * @param userId
+     * @param newPassword
+     */
+    const updateUserPassword = async (userId: string, newPassword: string) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            return await profileService.updateUserPassword(userId, newPassword);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    /** For users
+     * Update a user password with the API and returns the updated profiles
+     * @param userId
+     * @param newPassword
+     */
+    const updatePassword = async (userId: string, newPassword: string) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            return await profileService.updatePassword(userId, newPassword);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
         } finally {
             setLoading(false);
         }
