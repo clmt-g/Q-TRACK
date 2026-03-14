@@ -52,19 +52,6 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="(users)/profil"
-                options={{
-                    title: 'Profil',
-                    tabBarIcon: ({ color, size, focused }) => (
-                        <Ionicons
-                            name={focused ? "person" : "person-outline"}
-                            size={size}
-                            color={color}
-                        />
-                    ),
-                }}
-            />
-            <Tabs.Screen
                 name="(users)/profils"
                 options={{
                     title: 'Profils',
@@ -73,6 +60,20 @@ export default function TabsLayout() {
                     ),
                 }}
             />
+            <Tabs.Screen
+                name="type-incidents"
+                options={{
+                    title: 'Type incidents',
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Ionicons
+                            name="pricetag-outline"
+                            size={size}
+                            color={color}
+                        />
+                    ),
+                }}
+            />
         </Tabs>
+
     );
 }

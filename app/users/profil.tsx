@@ -58,8 +58,12 @@ export default function ProfileScreen() {
         <ScrollView style={globalStyles.container}>
             {/* Header */}
             <View style={globalStyles.header}>
-                <Text style={globalStyles.headerTitle}>Mon Profil</Text>
-                <Text style={globalStyles.subtitle}>Gérez vos informations</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </TouchableOpacity>
+                    <Text style={globalStyles.headerTitle}>Mon Profil</Text>
+                </View>
             </View>
 
             {/* Profile Card */}

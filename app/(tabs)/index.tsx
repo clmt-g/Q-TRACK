@@ -64,6 +64,14 @@ export default function HomeScreen() {
 
                     {/* Header Actions */}
                     <View style={styles.headerActions}>
+                        {/* Bouton Profil */}
+                        <TouchableOpacity
+                            style={styles.headerButton}
+                            onPress={() => router.push('/users/profil' as any)}
+                        >
+                            <Ionicons name="person-circle-outline" size={28} color={colors.primary} />
+                        </TouchableOpacity>
+
                         {/* Bouton Logout */}
                         <TouchableOpacity
                             style={styles.headerButton}
@@ -73,11 +81,6 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
-
-                {/* Email de l'utilisateur */}
-                {session?.user?.email && (
-                    <Text style={styles.userEmail}>{session.user.email}</Text>
-                )}
             </View>
 
             {/* Quick Stats */}
