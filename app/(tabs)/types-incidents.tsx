@@ -9,11 +9,11 @@ import ErrorState from '@/components/error';
 
 export default function TypeIncidentsScreen() {
     const router = useRouter();
-    const { typesIncidents, loading, error, loadIncidents } = useTypeIncident();
+    const { typesIncidents, loading, error, loadTypesIncidents, deleteTypeIncident } = useTypeIncident();
 
     useFocusEffect(
         useCallback(() => {
-            loadIncidents();
+            loadTypesIncidents();
         }, [])
     );
 
@@ -37,7 +37,7 @@ export default function TypeIncidentsScreen() {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            Alert.alert("TODO")
+                            await deleteTypeIncident(id);
                         } catch (err) {
                             console.error('Erreur lors de la suppression:', err);
                         }
@@ -52,7 +52,7 @@ export default function TypeIncidentsScreen() {
     }
 
     if (error) {
-        return <ErrorState error={error} onRetry={loadIncidents} />;
+        return <ErrorState error={error} onRetry={loadTypesIncidents} />;
     }
 
     const actifs = typesIncidents.filter(t => t.actif).length;
@@ -93,7 +93,7 @@ export default function TypeIncidentsScreen() {
                     <Text style={globalStyles.sectionTitle}>Liste des types</Text>
                     <TouchableOpacity
                         style={styles.addButton}
-                        onPress={() => router.push('/type-incidents/create' as any)}
+                        onPress={() => router.push('/types-incidents/create' as any)}
                     >
                         <Ionicons name="add" size={20} color="#fff" />
                     </TouchableOpacity>
@@ -136,7 +136,7 @@ export default function TypeIncidentsScreen() {
                         <View style={styles.actionsContainer}>
                             <TouchableOpacity
                                 style={styles.actionButton}
-                                onPress={() => router.push(`/type-incidents/${type.id_type_incident}/update` as any)}
+                                onPress={() => router.push(`/types-incidents/${type.id_type_incident}/update` as any)}
                             >
                                 <Ionicons name="create-outline" size={18} color="#F59E0B" />
                                 <Text style={styles.actionButtonText}>Modifier</Text>
