@@ -49,7 +49,6 @@ export function useProfile(userId: string | undefined) {
      * @param updates
      */
     const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'updated_at'>>) => {
-        // validation
         if (!userId || userId === '') {
             setError('User Id manquant');
             return;
@@ -58,13 +57,13 @@ export function useProfile(userId: string | undefined) {
         try {
             setLoading(true);
             setError(null);
-
             const data = await profileService.updateProfile(userId, updates);
             setProfile(data);
+            return data;
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error loading profile:', err);
+            console.error('Error updating profile:', err);
         } finally {
             setLoading(false);
         }
@@ -80,21 +79,18 @@ export function useProfile(userId: string | undefined) {
         nom: string;
         prenom: string;
         role: 'operateur' | 'qualite' | 'admin' | 'direction';
-    })=> {
+    }) => {
         try {
             setLoading(true);
             setError(null);
-
-            const data = await profileService.createProfile(profileData);
-            setProfile(data);
-            return data;
+            return await profileService.createProfile(profileData);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /**
      * soft delete a profile with the API and return the deleted profile
@@ -109,7 +105,6 @@ export function useProfile(userId: string | undefined) {
             await loadProfiles();
 
             Alert.alert('Succès', 'Le compte a été supprimé avec succès');
-            return data;
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
@@ -118,7 +113,7 @@ export function useProfile(userId: string | undefined) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /** For admins
      * Update a user password with the API and returns the updated profiles
@@ -137,7 +132,7 @@ export function useProfile(userId: string | undefined) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /** For users looking to update their own password
      * update the password of a user in auth and return the updated profile
@@ -158,7 +153,7 @@ export function useProfile(userId: string | undefined) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /**
      * load all profiles from the API

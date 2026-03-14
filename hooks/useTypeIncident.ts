@@ -30,7 +30,7 @@ export function useTypeIncident() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /**
      * Make the link between the view and the api to update a type of incident
@@ -55,7 +55,7 @@ export function useTypeIncident() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /**
      * Make the link between the view and the api to create a type of incident
@@ -78,7 +78,7 @@ export function useTypeIncident() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     /**
      * Make the link between the view and the api to delete a type of incident
@@ -96,7 +96,7 @@ export function useTypeIncident() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return { typeIncident, typesIncidents, loading, error, loadTypesIncidents, updateTypeIncident, createTypeIncident, deleteTypeIncident };
 }
