@@ -3,7 +3,7 @@ import { profileService, Profile } from '@/services/ProfileService';
 import {Alert} from "react-native";
 
 /**
- *
+ * Is the link between API and the views
  * @param userId
  * @return Profil, etat de chargement et fonctions de gestion
  */

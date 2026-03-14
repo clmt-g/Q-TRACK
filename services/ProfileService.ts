@@ -1,4 +1,3 @@
-import {List} from "postcss/lib/list";
 import { supabase, supabaseUrl, supabaseAnonKey } from '@/utils/supabase';
 
 export interface Profile {
@@ -7,9 +6,12 @@ export interface Profile {
     prenom: string;
     role: string;
     created_at: string;
-    deleted_at: string;
+    deleted_at: string | null;
 }
 
+/**
+ * The service which interact with the API for the profiles (and auth.users) table
+ */
 class ProfileService {
     /**
      * get a profile by its Id
