@@ -88,6 +88,16 @@ export default function TabsLayout() {
                     ),
                 }}
             />
+
+            <Tabs.Screen
+                name="actions-correctives"
+                options={{
+                    title: 'Actions',
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Ionicons name="build-outline" size={size} color={color} />
+                    ),
+                }}
+            />
         </Tabs>
 
     );
