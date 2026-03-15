@@ -144,4 +144,4 @@ class ActionCorrectiveService {
     }
 }
 
-export const actionCorrective = new ActionCorrectiveService();
+export const actionCorrectiveService = new ActionCorrectiveService();
