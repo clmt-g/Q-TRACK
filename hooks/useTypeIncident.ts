@@ -26,7 +26,6 @@ export function useTypeIncident() {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error loading profile:', err);
         } finally {
             setLoading(false);
         }
@@ -43,7 +42,7 @@ export function useTypeIncident() {
         try {
             setLoading(true);
             setError(null);
-            const data = await typeIncidentService.upadteTypeIncident(id, libelle, description, actif);
+            const data = await typeIncidentService.updateTypeIncident(id, libelle, description, actif);
             if (data) {
                 setTypesIncidents(prev => prev.map(t => t.id_type_incident === id ? data : t));
             }
@@ -51,7 +50,6 @@ export function useTypeIncident() {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error loading incident type:', err);
         } finally {
             setLoading(false);
         }

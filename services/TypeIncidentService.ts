@@ -25,11 +25,10 @@ class TypeIncidentService {
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Error fetching type incidents', error);
-            return [];
+            throw new Error(`Error fetching all the types of incidents: ${error.message}` );
         }
 
-        return data || [];
+        return data;
     }
 
     /**
@@ -50,8 +49,7 @@ class TypeIncidentService {
             .single();
 
         if (error) {
-            console.error('Error creating type incident', error);
-            return null;
+            throw new Error(`Error creating the type of incident: ${error.message}` );
         }
 
         return data;
@@ -64,7 +62,7 @@ class TypeIncidentService {
      * @param description
      * @param actif
      */
-    async upadteTypeIncident(id: number, libelle: string, description: string, actif: boolean): Promise<TypeIncident | null> {
+    async updateTypeIncident(id: number, libelle: string, description: string, actif: boolean): Promise<TypeIncident | null> {
         const { data, error } = await supabase
             .from('types_incidents')
             .update({
@@ -78,8 +76,7 @@ class TypeIncidentService {
             .single();
 
         if (error) {
-            console.error('Error updating type incident', error);
-            return null;
+            throw new Error(`Error updating the type of incident: ${error.message}` );
         }
 
         return data;
@@ -98,8 +95,7 @@ class TypeIncidentService {
             .single();
 
         if(error) {
-            console.error('Error deleting profile:', error);
-            throw new Error(error.message);
+            throw new Error(`Error deleting the type of incident: ${error.message}` );
         }
     }
 

@@ -1,4 +1,4 @@
-import { supabase, supabaseUrl, supabaseAnonKey } from '@/utils/supabase';
+import { supabase } from '@/utils/supabase';
 
 export interface Profile {
     id: string;
@@ -18,7 +18,7 @@ class ProfileService {
      * @param userId
      * @return Profile
      */
-    async getProfile(userId: string | undefined): Promise<Profile | null> {
+    async getProfile(userId: string | undefined): Promise<Profile> {
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
@@ -27,8 +27,7 @@ class ProfileService {
             .single();
 
         if (error) {
-            console.error('Error fetching profile:', error);
-            return null;
+            throw new Error(`Error fetching the user: ${error.message}` );
         }
 
         return data;
@@ -39,7 +38,7 @@ class ProfileService {
      * @param userId
      * @param updates
      */
-    async updateProfile(userId: string, updates: Partial<Omit<Profile, 'id' | 'created_at'>>): Promise<Profile | null> {
+    async updateProfile(userId: string, updates: Partial<Omit<Profile, 'id' | 'created_at'>>): Promise<Profile> {
         const { data, error } = await supabase
             .from('profiles')
             .update(updates)
@@ -49,8 +48,7 @@ class ProfileService {
             .single();
 
         if(error) {
-            console.error('Error updating profile:', error);
-            return null;
+            throw new Error(`Error updating the user: ${error.message}` );
         }
 
         return data;
@@ -68,7 +66,7 @@ class ProfileService {
             prenom: string;
             role: 'operateur' | 'qualite' | 'admin' | 'direction';
         }
-    ): Promise<Profile | null> {
+    ): Promise<Profile> {
         // FIXME : auth.SignUp authenticate the user as the one newly created
         // Créer l'utilisateur Auth (avec trigger qui crée le profil)
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -84,8 +82,7 @@ class ProfileService {
         });
 
         if (authError || !authData.user) {
-            console.error('Error creating user:', authError);
-            return null;
+            throw new Error(`Error creating the user: ${authError?.message}` );
         }
 
         // Récupérer le profil qui vient d'être créé par le trigger
@@ -96,8 +93,7 @@ class ProfileService {
             .single();
 
         if (profileError) {
-            console.error('Error fetching created profile:', profileError);
-            return null;
+            throw new Error(`Error fetching the user: ${profileError.message}` );
         }
 
         return profile;
@@ -107,7 +103,7 @@ class ProfileService {
      * Soft delete a profile according to the key userId
      * @param userId
      */
-    async deleteProfile(userId: string | undefined): Promise<Profile | null> {
+    async deleteProfile(userId: string | undefined): Promise<Profile> {
         const { data, error } = await supabase
             .from('profiles')
             .update({ deleted_at: new Date().toISOString() })
@@ -116,7 +112,7 @@ class ProfileService {
             .single();
 
         if(error) {
-            console.error('Error deleting profile:', error);
+            throw new Error(`Error deleting the user: ${error.message}` );
         }
 
         return data;
@@ -127,7 +123,7 @@ class ProfileService {
      * @param userId - the id of the user (works because the field id of profile is a foreign key of auth.user uid)
      * @param newPassword - the new password setted by the admin
      */
-    async updateUserPassword(userId: string, newPassword: string): Promise<Profile | null> {
+    async updateUserPassword(userId: string, newPassword: string): Promise<Profile> {
         // FIXME : doesn't work because auth.admin necessitate the service_role key
         // Utiliser l'Admin API
         const { data: authData, error: authError } = await supabase.auth.admin.updateUserById(
@@ -136,8 +132,7 @@ class ProfileService {
         );
 
         if (authError || !authData.user) {
-            console.error('Error updating password:', authError);
-            throw new Error(authError?.message || 'Impossible de mettre à jour le mot de passe');
+            throw new Error(`Error updating the password: ${authError?.message}` );
         }
 
         // Récupérer le profil mis à jour
@@ -149,8 +144,7 @@ class ProfileService {
             .single();
 
         if (profileError) {
-            console.error('Error fetching updated profile:', profileError);
-            throw new Error('Profil introuvable');
+            throw new Error(`Error fetching the user: ${profileError.message}` );
         }
 
         return profile;
@@ -163,7 +157,7 @@ class ProfileService {
      * @param oldPassword - the old password of the user
      * @param newPassword - the new password of the user
      */
-    async updatePassword(userId: string, email: string, oldPassword: string, newPassword: string): Promise<Profile | null> {
+    async updatePassword(userId: string, email: string, oldPassword: string, newPassword: string): Promise<Profile> {
         // On vérifie que le mot de passe communiqué par l'utilisateur est le bon
         // si signInWithPassword return une erreur alors c'est pas les cas
         const { error } = await supabase.auth.signInWithPassword({
@@ -172,8 +166,7 @@ class ProfileService {
         })
 
         if (error) {
-            console.error('The current password provided is invalid:', error);
-            return null;
+            throw new Error(`The provided password is incorrect: ${error.message}` );
         }
 
         // Si on arrive ici l'utilisateur connait son mot de passe
@@ -183,8 +176,7 @@ class ProfileService {
         });
 
         if (authError || !authData.user) {
-            console.error('Error updating password:', authError);
-            return null;
+            throw new Error(`Error updating the password: ${authError?.message}` );
         }
 
         // Récupérer le profil mis à jour
@@ -195,8 +187,7 @@ class ProfileService {
             .single();
 
         if (profileError) {
-            console.error('Error fetching updated profile:', profileError);
-            return null;
+            throw new Error(`Error fetching the user: ${profileError.message}` );
         }
 
         return profile;
@@ -214,11 +205,10 @@ class ProfileService {
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Error fetching profiles:', error);
-            return [];
+            throw new Error(`Error fetching all the users: ${error.message}` );
         }
 
-        return data || [];
+        return data;
     }
 
 }

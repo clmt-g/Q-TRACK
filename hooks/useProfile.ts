@@ -38,7 +38,6 @@ export function useProfile(userId: string | undefined) {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error loading profile:', err);
         } finally {
             setLoading(false);
         }
@@ -63,7 +62,6 @@ export function useProfile(userId: string | undefined) {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error updating profile:', err);
         } finally {
             setLoading(false);
         }
@@ -108,7 +106,6 @@ export function useProfile(userId: string | undefined) {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            Alert.alert('Erreur', 'Impossible de supprimer le compte');
             throw err;
         } finally {
             setLoading(false);
@@ -168,7 +165,6 @@ export function useProfile(userId: string | undefined) {
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
-            console.error('Error loading profiles:', err);
         } finally {
             setLoading(false);
         }
