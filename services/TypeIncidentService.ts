@@ -1,5 +1,4 @@
-import { supabase, supabaseUrl, supabaseAnonKey } from '@/utils/supabase';
-import {error} from "@expo/fingerprint/cli/build/utils/log";
+import { supabase } from '@/utils/supabase';
 
 export interface TypeIncident {
     id_type_incident: number;
@@ -11,7 +10,7 @@ export interface TypeIncident {
 }
 
 /**
- * The service which interact with the API for the type_incidents table
+ * The service which interact with the database for the type_incidents table
  */
 class TypeIncidentService {
 
@@ -41,7 +40,7 @@ class TypeIncidentService {
      */
     async createTypeIncident(libelle: string, description: string, actif: boolean): Promise<TypeIncident | null> {
         const { data, error } = await supabase
-        .from('types_incidents')
+            .from('types_incidents')
             .insert({
                 libelle: libelle,
                 description: description || null,
@@ -91,7 +90,7 @@ class TypeIncidentService {
      * @param id
      */
     async deleteTypeIncident(id: number): Promise<void> {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('types_incidents')
             .update({ deleted_at: new Date().toISOString() })
             .eq('id_type_incident', id)
