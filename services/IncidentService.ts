@@ -4,11 +4,14 @@ export interface Incident {
     id_incident: number;
     date_declaration: string;
     description: string;
-    status: string;
+    statut: string;
     id_user: string;
     id_type_incident: number;
     created_at: string;
     deleted_at: string | null;
+    types_incidents: {
+        libelle: string;
+    } | null;
 }
 
 /**
@@ -22,7 +25,7 @@ class IncidentService {
     async getAllIncidents(): Promise<Incident[]> {
         const { data, error } = await supabase
             .from('incidents')
-            .select('*')
+            .select('*, types_incidents(libelle)')
             .is('deleted_at', null)
             .order('created_at', { ascending: false });
 
@@ -59,11 +62,11 @@ class IncidentService {
     /**
      * Create an incident
      * @param description
-     * @param status
+     * @param statut
      * @param id_user
      * @param id_type_incident
      */
-    async createIncident(description: string, status: string, id_user: string, id_type_incident: number): Promise<Incident> {
+    async createIncident(description: string, statut: string, id_user: string, id_type_incident: number): Promise<Incident> {
         if (!id_user) {
             throw new Error('Utilisateur non connecté');
         }
@@ -73,7 +76,7 @@ class IncidentService {
             .insert({
                 date_declaration: new Date().toISOString(),
                 description: description,
-                status: status,
+                statut: statut,
                 id_user: id_user,
                 id_type_incident: id_type_incident,
             })
@@ -94,7 +97,7 @@ class IncidentService {
      * @param status
      * @param id_type_incident
      */
-    async updateIncident(id_incident: number, description: string, status: string, id_type_incident: number): Promise<Incident> {
+    async updateIncident(id_incident: number, description: string, statut: string, id_type_incident: number): Promise<Incident> {
         if (!id_incident) {
             throw new Error('Incident id not found');
         }
@@ -103,7 +106,7 @@ class IncidentService {
             .from('incidents')
             .update({
                 description: description,
-                status: status,
+                statut: statut,
                 id_type_incident: id_type_incident,
             })
             .eq('id_incident', id_incident)

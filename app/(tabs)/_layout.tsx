@@ -2,6 +2,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 
 export default function TabsLayout() {
@@ -67,6 +68,20 @@ export default function TabsLayout() {
                     tabBarIcon: ({ color, size, focused }) => (
                         <Ionicons
                             name="pricetag-outline"
+                            size={size}
+                            color={color}
+                        />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="incidents"
+                options={{
+                    title: 'Incidents',
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <AntDesign
+                            name="flag"
                             size={size}
                             color={color}
                         />

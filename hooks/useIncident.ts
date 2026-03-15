@@ -4,7 +4,7 @@ import { incidentService, Incident } from "@/services/IncidentService";
 /**
  * Is the link between the API and the views
  */
-export function useIncidentService() {
+export function useIncident() {
     const [incident, setIncident] = useState<Incident | null>(null);
     const [incidents, setIncidents] = useState<Incident[]>([]);
     const [loading, setLoading] = useState(false);
@@ -56,12 +56,12 @@ export function useIncidentService() {
      * @param status
      * @param id_type_incident
      */
-    const updateIncident = async (id_incident: number, description: string, status: string, id_type_incident: number) => {
+    const updateIncident = async (id_incident: number, description: string, statut: string, id_type_incident: number) => {
         try {
             setLoading(true);
             setError(null);
 
-            const data = await incidentService.updateIncident(id_incident, description, status, id_type_incident);
+            const data = await incidentService.updateIncident(id_incident, description, statut, id_type_incident);
 
             if (data) {
                 setIncidents(prev => prev.map(t => t.id_incident === id_incident ? data : t));
@@ -82,16 +82,12 @@ export function useIncidentService() {
      * @param id_user
      * @param id_type_incident
      */
-    const createIncident = async (description: string, status: string, id_user: string, id_type_incident: number)=> {
+    const createIncident = async (description: string, statut: string, id_user: string, id_type_incident: number)=> {
         try {
             setLoading(true);
             setError(null);
 
-            const data = await incidentService.createIncident(description, status, id_user, id_type_incident);
-            if (data) {
-                setIncidents(prev => [data, ...prev]);
-            }
-            return data;
+            return await incidentService.createIncident(description, statut, id_user, id_type_incident);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
