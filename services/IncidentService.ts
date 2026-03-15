@@ -12,6 +12,10 @@ export interface Incident {
     types_incidents: {
         libelle: string;
     } | null;
+    profiles: {
+        nom: string;
+        prenom: string;
+    } | null;
 }
 
 /**
@@ -47,7 +51,7 @@ class IncidentService {
 
         const { data, error } = await supabase
             .from('incidents')
-            .select('*')
+            .select('*, types_incidents(libelle)')
             .eq('id_incident', id_incident)
             .is('deleted_at', null)
             .single();
@@ -56,7 +60,13 @@ class IncidentService {
             throw new Error(`Error while fetching incident: ${error.message}`);
         }
 
-        return data;
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('nom, prenom')
+            .eq('id', data.id_user)
+            .single();
+
+        return { ...data, profiles: profile };
     }
 
     /**
