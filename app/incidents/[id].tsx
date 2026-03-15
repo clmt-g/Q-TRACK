@@ -44,6 +44,10 @@ export default function IncidentDetailScreen() {
         return <LoadingState message="Chargement de l'incident..." />;
     }
 
+    if (!incident) {
+        return <LoadingState message="Chargement de l'incident..." />;
+    }
+
     if (error || !incident) {
         return <ErrorState error={error || 'Incident introuvable'} onRetry={() => router.back()} />;
     }

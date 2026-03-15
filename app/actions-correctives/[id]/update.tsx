@@ -123,7 +123,7 @@ export default function ActionCorrectiveUpdateScreen() {
             <ScrollView style={globalStyles.container} keyboardShouldPersistTaps="handled">
                 {/* Header */}
                 <View style={[globalStyles.header, { paddingTop: insets.top + 8 }]}>
-                    <Text style={globalStyles.headerTitle}>Modifier l&expos;action corrective</Text>
+                    <Text style={globalStyles.headerTitle}>Modifier l&apos;action corrective</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
                             style={{ padding: 6 }}

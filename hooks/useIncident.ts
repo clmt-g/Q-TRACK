@@ -7,7 +7,7 @@ import { incidentService, Incident } from "@/services/IncidentService";
 export function useIncident() {
     const [incident, setIncident] = useState<Incident | null>(null);
     const [incidents, setIncidents] = useState<Incident[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
