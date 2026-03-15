@@ -299,6 +299,14 @@ export default function IncidentsScreen() {
                                     <Ionicons name="trash-outline" size={18} color="#C32D2D" />
                                     <Text style={styles.actionButtonText}>Supprimer</Text>
                                 </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => console.log('todo')}
+                                >
+                                    <Ionicons name="build-outline" size={18} color="#10B981" />
+                                    <Text style={styles.actionButtonText}>Action corrective</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     );
@@ -540,6 +548,7 @@ const styles = StyleSheet.create({
     },
     actionsContainer: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         marginTop: 12,
         gap: 8,
         paddingTop: 12,
@@ -547,7 +556,6 @@ const styles = StyleSheet.create({
         borderTopColor: colors.border,
     },
     actionButton: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -556,6 +564,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 8,
         gap: 6,
+        minWidth: '45%',
+        flex: 1,
     },
     actionButtonText: {
         fontSize: 13,
