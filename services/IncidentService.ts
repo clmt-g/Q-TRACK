@@ -104,7 +104,7 @@ class IncidentService {
      * Update an incident according to the key id_incident provided
      * @param id_incident
      * @param description
-     * @param status
+     * @param statut
      * @param id_type_incident
      */
     async updateIncident(id_incident: number, description: string, statut: string, id_type_incident: number): Promise<Incident> {
@@ -145,9 +145,7 @@ class IncidentService {
             .update({
                 deleted_at: new Date().toISOString()
             })
-            .eq('id_incident', id_incident)
-            .select()
-            .single();
+            .eq('id_incident', id_incident);
 
         if (error) {
             throw new Error(`Error while deleting incidents: ${error.message}`);
