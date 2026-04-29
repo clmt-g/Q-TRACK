@@ -1,14 +1,13 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
-import { useIncident } from '@/hooks/useIncident';
+import { useIncident, Incident } from '@/hooks/useIncident';
 import { useTypeIncident } from '@/hooks/useTypeIncident';
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-import { Incident } from '@/services/IncidentService'; /* FIXME : import service */
 import { getStatutStyle, formatDate } from '@/utils/incidents';
 
 // === Constants for the filters ===

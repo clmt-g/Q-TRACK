@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { incidentService, Incident } from "@/services/IncidentService";
 
+export type { Incident };
+
 /**
  * Is the link between the API and the views
  */
