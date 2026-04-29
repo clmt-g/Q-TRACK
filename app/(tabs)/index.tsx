@@ -11,6 +11,7 @@ import LoadingState from "@/components/loading";
 import {useCallback} from "react";
 import {useIncident} from "@/hooks/useIncident";
 import {useTypeIncident} from "@/hooks/useTypeIncident";
+import {getStatutStyle, formatDate} from "@/utils/incidents";
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -162,27 +163,24 @@ export default function HomeScreen() {
             <View style={globalStyles.section}>
                 <Text style={globalStyles.sectionTitle}>Incidents récents</Text>
 
-                <View style={styles.incidentCard}>
-                    <View style={globalStyles.spaceBetween}>
-                        <View style={[styles.statusBadge, styles.statusDeclare]}>
-                            <Text style={styles.statusText}>Déclaré</Text>
-                        </View>
-                        <Text style={styles.incidentDate}>Aujourd&#39;hui, 14:30</Text>
-                    </View>
-                    <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>Non-conformité emballage Lot A2345</Text>
-                    <Text style={globalStyles.cardDescription}>Type : Défaut emballage</Text>
-                </View>
-
-                <View style={styles.incidentCard}>
-                    <View style={globalStyles.spaceBetween}>
-                        <View style={[styles.statusBadge, styles.statusEnCours]}>
-                            <Text style={styles.statusText}>En cours</Text>
-                        </View>
-                        <Text style={styles.incidentDate}>Hier, 10:15</Text>
-                    </View>
-                    <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>Température hors norme Zone 3</Text>
-                    <Text style={globalStyles.cardDescription}>Type : Conditions de stockage</Text>
-                </View>
+                {incidents.slice(0, 2).map((incident) => {
+                    const { badge, color, label, icon } = getStatutStyle(incident.statut);
+                    return (
+                        <TouchableOpacity key={incident.id_incident} onPress={() => router.push(`/incidents/${incident.id_incident}` as any)}>
+                            <View style={styles.incidentCard}>
+                                <View style={globalStyles.spaceBetween}>
+                                    <View style={[styles.statusBadge, badge, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                                        <Ionicons name={icon as any} size={13} color={color} />
+                                        <Text style={[styles.statusText, { color }]}>{label}</Text>
+                                    </View>
+                                    <Text style={styles.incidentDate}>{formatDate(incident.date_declaration)}</Text>
+                                </View>
+                                <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>{incident.description}</Text>
+                                <Text style={globalStyles.cardDescription}>Type : {incident.types_incidents?.libelle ?? 'Non défini'}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )
+                })}
             </View>
 
             {/* Info Banner */}

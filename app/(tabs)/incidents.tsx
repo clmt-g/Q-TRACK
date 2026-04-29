@@ -9,8 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { Incident } from '@/services/IncidentService'; /* FIXME : import service */
-import { getStatutStyle } from '@/utils/incidents';
+import { getStatutStyle, formatDate } from '@/utils/incidents';
 
+// === Constants for the filters ===
 // Statuts disponibles
 const STATUTS = [
     { value: 'tous', label: 'Tous', color: colors.textMuted },
@@ -46,17 +47,7 @@ export default function IncidentsScreen() {
         }, [])
     );
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
+    // === Filter functions ===
     const filterByPeriode = (incident: Incident) => {
         if (filtrePeriode === 'tous') return true;
         const now = new Date();
