@@ -8,10 +8,12 @@ import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function IncidentDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { incident, loadIncident, loading, error } = useIncident();
 
     useFocusEffect(
@@ -37,12 +39,13 @@ export default function IncidentDetailScreen() {
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header */}
-            <View style={globalStyles.header}>
-                <TouchableOpacity style={{ padding: 6 }} onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
-                <Text style={globalStyles.headerTitle}>Incident</Text>
-                <View style={{ width: 24 }} />
+            <View style={[globalStyles.header, { paddingTop: insets.top + 8 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </TouchableOpacity>
+                    <Text style={globalStyles.headerTitle}>Incident</Text>
+                </View>
             </View>
 
             {/* Card principale */}

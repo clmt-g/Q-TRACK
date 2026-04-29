@@ -7,27 +7,8 @@ import { useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-
-const getStatutConfig = (statut: string) => {
-    const configs: Record<string, { icon: string; color: string; label: string }> = {
-        prevue: {
-            icon: 'calendar',
-            color: '#60A5FA',
-            label: 'Prévue',
-        },
-        en_cours: {
-            icon: 'time',
-            color: '#F59E0B',
-            label: 'En cours',
-        },
-        terminee: {
-            icon: 'checkmark-circle',
-            color: '#10B981',
-            label: 'Terminée',
-        },
-    };
-    return configs[statut] || configs.prevue;
-};
+import { getStatutConfig } from '@/utils/actionsCorrectives';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const getIncidentStatutConfig = (statut: string) => {
     switch (statut) {
@@ -41,6 +22,7 @@ const getIncidentStatutConfig = (statut: string) => {
 export default function ActionCorrectiveDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { actionCorrective, loadActionCorrective, loading, error } = useActionCorrective();
 
     useFocusEffect(
@@ -57,7 +39,7 @@ export default function ActionCorrectiveDetailScreen() {
         return <ErrorState error={error || 'Action corrective introuvable'} onRetry={() => loadActionCorrective(Number(id))} />;
     }
 
-    const statutConfig = getStatutConfig(actionCorrective.statut);
+    const { badge, color, label, icon } = getStatutConfig(actionCorrective.statut);
     const incidentStatut = actionCorrective.incidents
         ? getIncidentStatutConfig(actionCorrective.incidents.statut)
         : null;
@@ -65,29 +47,30 @@ export default function ActionCorrectiveDetailScreen() {
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header */}
-            <View style={globalStyles.header}>
-                <TouchableOpacity style={{ padding: 6 }} onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
-                <Text style={globalStyles.headerTitle}>Action corrective</Text>
-                <View style={{ width: 24 }} />
+            <View style={[globalStyles.header, { paddingTop: insets.top + 8 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </TouchableOpacity>
+                    <Text style={globalStyles.headerTitle}>Action Corrective</Text>
+                </View>
             </View>
 
             {/* Card principale */}
             <View style={styles.mainCard}>
-                <View style={[styles.iconContainer, { backgroundColor: statutConfig.color + '20' }]}>
-                    <View style={[styles.iconWrapper, { backgroundColor: statutConfig.color }]}>
-                        <Ionicons name={statutConfig.icon as any} size={36} color="#fff" />
+                <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+                    <View style={[styles.iconWrapper, { backgroundColor: color }]}>
+                        <Ionicons name={icon as any} size={36} color="#fff" />
                     </View>
                 </View>
 
                 <Text style={styles.actionId}>#{actionCorrective.id_action}</Text>
 
                 {/* Badge statut */}
-                <View style={[styles.statutBadge, { backgroundColor: statutConfig.color + '15' }]}>
-                    <Ionicons name={statutConfig.icon as any} size={16} color={statutConfig.color} />
-                    <Text style={[styles.statutText, { color: statutConfig.color }]}>
-                        {statutConfig.label}
+                <View style={[styles.statutBadge, { backgroundColor: color + '15' }]}>
+                    <Ionicons name={icon as any} size={16} color={color} />
+                    <Text style={[styles.statutText, { color: color }]}>
+                        {label}
                     </Text>
                 </View>
             </View>

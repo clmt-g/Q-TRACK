@@ -9,7 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { ActionCorrective } from '@/services/ActionCorrectiveService';
+import { formatDate, getStatutConfig } from '@/utils/actionsCorrectives';
 
+// === Constants for filtres ===
 const STATUTS = [
     { value: 'tous', label: 'Tous', color: colors.textMuted },
     { value: 'prevue', label: 'Prévue', color: '#60A5FA' },
@@ -44,25 +46,6 @@ export default function ActionsCorractivesScreen() {
             loadProfiles();
         }, [])
     );
-
-    const formatDate = (dateString: string | null) => {
-        if (!dateString) return 'Non renseignée';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const getStatutConfig = (statut: string) => {
-        switch (statut) {
-            case 'prevue':    return { badge: styles.statutPrevue,   color: '#60A5FA', label: 'Prévue',   icon: 'calendar' };
-            case 'en_cours':  return { badge: styles.statutEnCours,  color: '#F59E0B', label: 'En cours', icon: 'time' };
-            case 'terminee':  return { badge: styles.statutTerminee, color: '#10B981', label: 'Terminée', icon: 'checkmark-circle' };
-            default:          return { badge: styles.statutPrevue,   color: '#60A5FA', label: statut,     icon: 'help-circle' };
-        }
-    };
 
     const filterByPeriode = (action: ActionCorrective) => {
         if (filtrePeriode === 'tous' || !action.date_mise_en_place) return true;
@@ -285,14 +268,14 @@ export default function ActionsCorractivesScreen() {
                 </View>
 
                 {actionsFiltrees.map((action) => {
-                    const statut = getStatutConfig(action.statut);
+                    const { badge, color, label, icon } = getStatutConfig(action.statut);
                     return (
-                        <View key={action.id_action} style={[styles.card, { borderLeftColor: statut.color }]}>
+                        <View key={action.id_action} style={[styles.card, { borderLeftColor: color }]}>
                             {/* Header carte */}
                             <View style={globalStyles.spaceBetween}>
-                                <View style={[styles.statutBadge, statut.badge]}>
-                                    <Ionicons name={statut.icon as any} size={13} color={statut.color} />
-                                    <Text style={[styles.statutText, { color: statut.color }]}>{statut.label}</Text>
+                                <View style={[styles.statutBadge, badge]}>
+                                    <Ionicons name={icon as any} size={13} color={color} />
+                                    <Text style={[styles.statutText, { color: color }]}>{label}</Text>
                                 </View>
                                 <Text style={styles.dateText}>{formatDate(action.date_mise_en_place)}</Text>
                             </View>
@@ -595,18 +578,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         gap: 4,
-    },
-    statutPrevue: {
-        backgroundColor: '#1E3A8A',
-        borderColor: '#60A5FA',
-    },
-    statutEnCours: {
-        backgroundColor: '#78350F',
-        borderColor: '#F59E0B',
-    },
-    statutTerminee: {
-        backgroundColor: '#065F46',
-        borderColor: '#10B981',
     },
     statutText: {
         fontSize: 12,

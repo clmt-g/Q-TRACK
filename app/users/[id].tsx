@@ -6,6 +6,7 @@ import { globalStyles, colors } from '@/styles/theme';
 import { useProfile } from "@/hooks/useProfile";
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 // Fonction pour obtenir l'icône et la couleur selon le rôle
 const getRoleConfig = (role: string) => {
@@ -37,6 +38,7 @@ const getRoleConfig = (role: string) => {
 export default function ProfileDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { profile, loading, error, loadProfile } = useProfile(id as string);
 
     if (loading) {
@@ -52,12 +54,13 @@ export default function ProfileDetailScreen() {
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header avec bouton retour */}
-            <View style={globalStyles.header}>
-                <TouchableOpacity style={{ padding: 6 }} onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
-                <Text style={globalStyles.headerTitle}>Profil</Text>
-                <View style={{ width: 24 }} />
+            <View style={[globalStyles.header, { paddingTop: insets.top + 8 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </TouchableOpacity>
+                    <Text style={globalStyles.headerTitle}>Profile</Text>
+                </View>
             </View>
 
             {/* Card principale avec avatar */}
