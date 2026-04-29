@@ -9,15 +9,21 @@ import { useProfile } from "@/hooks/useProfile";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
 import {useCallback} from "react";
+import {useIncident} from "@/hooks/useIncident";
+import {useTypeIncident} from "@/hooks/useTypeIncident";
 
 export default function HomeScreen() {
     const router = useRouter();
     const { session } = useAuth();
-    const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
+    const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
+    const { incidents, loading: loadingIncidents, error: errorIncidents, loadIncidents } = useIncident();
+    const { typesIncidents, loadTypesIncidents } = useTypeIncident();
 
     useFocusEffect(
         useCallback(() => {
             loadProfile();
+            loadIncidents();
+            loadTypesIncidents();
         }, [])
     );
 
@@ -43,12 +49,13 @@ export default function HomeScreen() {
     };
 
     // Afficher le loading
-    if (loading) {
+    if (loadingProfile || loadingIncidents) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
     // Afficher l'erreur
-    if (error) {
+    if (errorProfile || errorIncidents) {
+        const error = errorProfile ?? errorIncidents ?? 'Une erreur est survenue';
         return <ErrorState error={error} onRetry={loadProfile} />;
     }
 
@@ -104,7 +111,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.actionCard}
-                    onPress={() => {/* Navigation vers déclaration */}}
+                    onPress={() => router.push('/incidents/create' as any)}
                 >
                     <View style={[styles.actionIcon, { backgroundColor: '#1E3A8A15' }]}>
                         <Ionicons name="add-circle" size={28} color="#60A5FA" />
@@ -120,7 +127,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.actionCard}
-                    onPress={() => {/* Navigation vers historique */}}
+                    onPress={() => router.push('./incidents' as any)}
                 >
                     <View style={[styles.actionIcon, { backgroundColor: '#7C3AED15' }]}>
                         <Ionicons name="list" size={28} color="#A78BFA" />
@@ -136,7 +143,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                     style={styles.actionCard}
-                    onPress={() => {/* Navigation vers actions correctives */}}
+                    onPress={() => router.push('./actions-correctives' as any)}
                 >
                     <View style={[styles.actionIcon, { backgroundColor: '#EA580C15' }]}>
                         <Ionicons name="construct" size={28} color="#FB923C" />

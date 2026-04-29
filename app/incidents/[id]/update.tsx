@@ -9,12 +9,7 @@ import ErrorState from '@/components/error';
 import { useState, useEffect, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-
-const STATUTS = [
-    { value: 'declare',  label: 'Déclaré',  color: '#60A5FA', icon: 'alert-circle' },
-    { value: 'en_cours', label: 'En cours', color: '#F59E0B', icon: 'time' },
-    { value: 'cloture',  label: 'Clôturé',  color: '#10B981', icon: 'checkmark-circle' },
-] as const;
+import { STATUTS } from '@/constants/incidents';
 
 export default function IncidentUpdateScreen() {
     const { id } = useLocalSearchParams();

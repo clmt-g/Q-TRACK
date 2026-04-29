@@ -7,27 +7,7 @@ import { useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-
-const getStatutConfig = (statut: string) => {
-    const configs: Record<string, { icon: string; color: string; label: string }> = {
-        declare: {
-            icon: 'alert-circle',
-            color: '#60A5FA',
-            label: 'Déclaré',
-        },
-        en_cours: {
-            icon: 'time',
-            color: '#F59E0B',
-            label: 'En cours',
-        },
-        cloture: {
-            icon: 'checkmark-circle',
-            color: '#10B981',
-            label: 'Clôturé',
-        },
-    };
-    return configs[statut] || configs.declare;
-};
+import { getStatutStyle } from '@/utils/incidents';
 
 export default function IncidentDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -52,7 +32,7 @@ export default function IncidentDetailScreen() {
         return <ErrorState error={error || 'Incident introuvable'} onRetry={() => router.back()} />;
     }
 
-    const statutConfig = getStatutConfig(incident.statut);
+    const { badge, color, label, icon } = getStatutStyle(incident.statut);
 
     return (
         <ScrollView style={globalStyles.container}>
@@ -67,19 +47,19 @@ export default function IncidentDetailScreen() {
 
             {/* Card principale */}
             <View style={styles.incidentCard}>
-                <View style={[styles.iconContainer, { backgroundColor: statutConfig.color + '20' }]}>
-                    <View style={[styles.iconWrapper, { backgroundColor: statutConfig.color }]}>
-                        <Ionicons name={statutConfig.icon as any} size={36} color="#fff" />
+                <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+                    <View style={[styles.iconWrapper, { backgroundColor: color }]}>
+                        <Ionicons name={icon as any} size={36} color="#fff" />
                     </View>
                 </View>
 
                 <Text style={styles.incidentId}>#{incident.id_incident}</Text>
 
                 {/* Badge statut */}
-                <View style={[styles.statutBadge, { backgroundColor: statutConfig.color + '15' }]}>
-                    <Ionicons name={statutConfig.icon as any} size={16} color={statutConfig.color} />
-                    <Text style={[styles.statutText, { color: statutConfig.color }]}>
-                        {statutConfig.label}
+                <View style={[styles.statutBadge, { backgroundColor: color + '15' }]}>
+                    <Ionicons name={icon as any} size={16} color={color} />
+                    <Text style={[styles.statutText, { color: color }]}>
+                        {label}
                     </Text>
                 </View>
             </View>

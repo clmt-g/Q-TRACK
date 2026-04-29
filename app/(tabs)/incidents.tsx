@@ -8,7 +8,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-import { Incident } from '@/services/IncidentService';
+import { Incident } from '@/services/IncidentService'; /* FIXME : import service */
+import { getStatutStyle } from '@/utils/incidents';
 
 // Statuts disponibles
 const STATUTS = [
@@ -54,15 +55,6 @@ export default function IncidentsScreen() {
             hour: '2-digit',
             minute: '2-digit',
         });
-    };
-
-    const getStatutStyle = (statut: string) => {
-        switch (statut) {
-            case 'declare':   return { badge: styles.statutDeclare,  color: '#60A5FA', label: 'Déclaré',  icon: 'alert-circle' };
-            case 'en_cours':  return { badge: styles.statutEnCours,  color: '#F59E0B', label: 'En cours', icon: 'time' };
-            case 'cloture':   return { badge: styles.statutCloture,  color: '#10B981', label: 'Clôturé',  icon: 'checkmark-circle' };
-            default:          return { badge: styles.statutDeclare,  color: '#60A5FA', label: statut,     icon: 'help-circle' };
-        }
     };
 
     const filterByPeriode = (incident: Incident) => {
@@ -243,14 +235,14 @@ export default function IncidentsScreen() {
                 </View>
 
                 {incidentsFiltres.map((incident) => {
-                    const statut = getStatutStyle(incident.statut);
+                    const { badge, color, label, icon } = getStatutStyle(incident.statut);
                     return (
                         <View key={incident.id_incident} style={styles.card}>
                             {/* Header carte */}
                             <View style={globalStyles.spaceBetween}>
-                                <View style={[styles.statutBadge, statut.badge]}>
-                                    <Ionicons name={statut.icon as any} size={13} color={statut.color} />
-                                    <Text style={[styles.statutText, { color: statut.color }]}>{statut.label}</Text>
+                                <View style={[styles.statutBadge, badge]}>
+                                    <Ionicons name={icon as any} size={13} color={color} />
+                                    <Text style={[styles.statutText, { color }]}>{label}</Text>
                                 </View>
                                 <Text style={styles.dateText}>{formatDate(incident.date_declaration)}</Text>
                             </View>
@@ -503,18 +495,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         gap: 4,
-    },
-    statutDeclare: {
-        backgroundColor: '#1E3A8A',
-        borderColor: '#60A5FA',
-    },
-    statutEnCours: {
-        backgroundColor: '#78350F',
-        borderColor: '#F59E0B',
-    },
-    statutCloture: {
-        backgroundColor: '#065F46',
-        borderColor: '#10B981',
     },
     statutText: {
         fontSize: 12,
