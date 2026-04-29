@@ -10,10 +10,12 @@ import {useProfile} from "@/hooks/useProfile";
 import {useCallback, useEffect} from "react";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
     const router = useRouter();
     const { session } = useAuth();
+    const insets = useSafeAreaInsets();
     const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
 
     useFocusEffect(
@@ -57,7 +59,7 @@ export default function ProfileScreen() {
     return (
         <ScrollView style={globalStyles.container}>
             {/* Header */}
-            <View style={globalStyles.header}>
+            <View style={[globalStyles.header, { paddingTop: insets.top + 8 }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color={colors.text} />

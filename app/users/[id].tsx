@@ -6,8 +6,6 @@ import { globalStyles, colors } from '@/styles/theme';
 import { useProfile } from "@/hooks/useProfile";
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-import { LinearGradient } from 'expo-linear-gradient';
-import {useAuth} from "@/contexts/AuthContext";
 
 // Fonction pour obtenir l'icône et la couleur selon le rôle
 const getRoleConfig = (role: string) => {
