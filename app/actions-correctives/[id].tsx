@@ -9,15 +9,7 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutConfig } from '@/utils/actionsCorrectives';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const getIncidentStatutConfig = (statut: string) => {
-    switch (statut) {
-        case 'declare':  return { color: '#60A5FA', label: 'Déclaré' };
-        case 'en_cours': return { color: '#F59E0B', label: 'En cours' };
-        case 'cloture':  return { color: '#10B981', label: 'Clôturé' };
-        default:         return { color: colors.textMuted, label: statut };
-    }
-};
+import { getStatutStyle } from '@/utils/incidents';
 
 export default function ActionCorrectiveDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -41,7 +33,7 @@ export default function ActionCorrectiveDetailScreen() {
 
     const { badge, color, label, icon } = getStatutConfig(actionCorrective.statut);
     const incidentStatut = actionCorrective.incidents
-        ? getIncidentStatutConfig(actionCorrective.incidents.statut)
+        ? getStatutStyle(actionCorrective.incidents.statut)
         : null;
 
     return (
