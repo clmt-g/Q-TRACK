@@ -11,11 +11,12 @@ import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { STATUTS } from '@/constants/actionCorrectives';
+import ErrorState from "@/components/error";
 
 export default function ActionCorrectiveCreateScreen() {
     const router = useRouter();
     const { session } = useAuth();
-    const { createActionCorrective, loading } = useActionCorrective();
+    const { createActionCorrective, loading, error } = useActionCorrective();
     const { incidents, loadIncidents } = useIncident();
 
     const [date, setDate] = useState<Date>(new Date());
@@ -89,6 +90,10 @@ export default function ActionCorrectiveCreateScreen() {
 
     if (loading) {
         return <LoadingState message="Enregistrement..." />;
+    }
+
+    if (error) {
+        return <ErrorState error={error || 'Action corrective introuvable'} onRetry={() => router.back()} />;
     }
 
     return (

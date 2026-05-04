@@ -10,11 +10,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import { STATUTS } from '@/constants/incidents';
+import ErrorState from "@/components/error";
 
 export default function IncidentCreateScreen() {
     const router = useRouter();
     const { session } = useAuth();
-    const { createIncident, loading } = useIncident();
+    const { createIncident, loading, error } = useIncident();
     const { typesIncidents, loadTypesIncidents } = useTypeIncident();
 
     const [description, setDescription] = useState('');
@@ -78,6 +79,10 @@ export default function IncidentCreateScreen() {
 
     if (loading) {
         return <LoadingState message="Enregistrement..." />;
+    }
+
+    if (error) {
+        return <ErrorState error={error} onRetry={() => router.back()} />;
     }
 
     return (
