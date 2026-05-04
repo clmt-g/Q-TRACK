@@ -10,6 +10,7 @@ import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { formatDateTime } from '@/utils/date';
+import {getRoleBadgeStyle, getRoleLabel, getRoleIcon} from '@/utils/users';
 
 export default function ProfilesScreen() {
     const router = useRouter();
@@ -21,54 +22,6 @@ export default function ProfilesScreen() {
             loadProfiles();
         }, [])
     );
-
-    // Fonction pour obtenir la couleur du badge selon le rôle
-    const getRoleBadgeStyle = (role: string) => {
-        switch (role) {
-            case 'admin':
-                return styles.roleAdmin;
-            case 'direction':
-                return styles.roleDirection;
-            case 'qualite':
-                return styles.roleQualite;
-            case 'operateur':
-                return styles.roleOperateur;
-            default:
-                return styles.roleOperateur;
-        }
-    };
-
-    // Fonction pour obtenir le label du rôle en français
-    const getRoleLabel = (role: string) => {
-        switch (role) {
-            case 'admin':
-                return 'Administrateur';
-            case 'direction':
-                return 'Direction';
-            case 'qualite':
-                return 'Qualité';
-            case 'operateur':
-                return 'Opérateur';
-            default:
-                return role;
-        }
-    };
-
-    // Fonction pour obtenir l'icône du rôle
-    const getRoleIcon = (role: string) => {
-        switch (role) {
-            case 'admin':
-                return 'shield-checkmark';
-            case 'direction':
-                return 'business';
-            case 'qualite':
-                return 'checkmark-circle';
-            case 'operateur':
-                return 'person';
-            default:
-                return 'person';
-        }
-    };
 
     const handleDelete = async (userId: string) => {
         Alert.alert(
@@ -337,23 +290,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: colors.text,
     },
-    roleAdmin: {
-        backgroundColor: '#92400E',
-        borderColor: '#F59E0B',
-    },
-    roleDirection: {
-        backgroundColor: '#7C2D12',
-        borderColor: '#F97316',
-    },
-    roleQualite: {
-        backgroundColor: '#065F46',
-        borderColor: '#10B981',
-    },
-    roleOperateur: {
-        backgroundColor: '#1E3A8A',
-        borderColor: '#60A5FA',
-    },
-
     dateText: {
         fontSize: 12,
         color: colors.textMuted,

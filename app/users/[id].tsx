@@ -7,33 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-
-// Fonction pour obtenir l'icône et la couleur selon le rôle
-const getRoleConfig = (role: string) => {
-    const configs: Record<string, { icon: any; color: string; gradient: string[] }> = {
-        operateur: {
-            icon: 'construct',
-            color: '#3b82f6',
-            gradient: ['#3b82f6', '#2563eb']
-        },
-        qualite: {
-            icon: 'checkmark-circle',
-            color: '#10b981',
-            gradient: ['#10b981', '#059669']
-        },
-        admin: {
-            icon: 'settings',
-            color: '#8b5cf6',
-            gradient: ['#8b5cf6', '#7c3aed']
-        },
-        direction: {
-            icon: 'briefcase',
-            color: '#f59e0b',
-            gradient: ['#f59e0b', '#d97706']
-        }
-    };
-    return configs[role] || configs.operateur;
-};
+import { getRoleConfig } from '@/utils/users';
 
 export default function ProfileDetailScreen() {
     const { id } = useLocalSearchParams();
