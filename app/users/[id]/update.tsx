@@ -8,14 +8,7 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// Config pour les rôles disponibles
-const ROLES = [
-    { value: 'operateur', label: 'Opérateur', icon: 'construct', color: '#3b82f6' },
-    { value: 'qualite', label: 'Qualité', icon: 'checkmark-circle', color: '#10b981' },
-    { value: 'admin', label: 'Admin', icon: 'settings', color: '#8b5cf6' },
-    { value: 'direction', label: 'Direction', icon: 'briefcase', color: '#f59e0b' },
-];
+import { ROLES } from '@/constants/users';
 
 export default function ProfileUpdateScreen() {
     const { id } = useLocalSearchParams();

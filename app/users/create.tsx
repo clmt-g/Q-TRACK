@@ -8,14 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import PasswordInput, { isPasswordValid } from '@/components/passwordInput';
-
-// Config pour les rôles disponibles
-const ROLES = [
-    { value: 'operateur', label: 'Opérateur', icon: 'construct', color: '#3b82f6' },
-    { value: 'qualite', label: 'Qualité', icon: 'checkmark-circle', color: '#10b981' },
-    { value: 'admin', label: 'Admin', icon: 'settings', color: '#8b5cf6' },
-    { value: 'direction', label: 'Direction', icon: 'briefcase', color: '#f59e0b' },
-] as const;
+import { ROLES } from '@/constants/users';
 
 export default function ProfileCreateScreen() {
     const router = useRouter();
@@ -236,7 +229,7 @@ export default function ProfileCreateScreen() {
                             styles.roleOption,
                             role === roleOption.value && styles.roleOptionSelected
                         ]}
-                        onPress={() => setRole(roleOption.value)}
+                        onPress={() => setRole(roleOption.value as "operateur" | "qualite" | "admin" | "direction")}
                     >
                         <View style={[styles.roleIconContainer, { backgroundColor: roleOption.color + '15' }]}>
                             <Ionicons name={roleOption.icon as any} size={20} color={roleOption.color} />

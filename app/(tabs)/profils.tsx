@@ -9,6 +9,7 @@ import {useAuth} from "@/contexts/AuthContext";
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { formatDateTime } from '@/utils/date';
 
 export default function ProfilesScreen() {
     const router = useRouter();
@@ -20,18 +21,6 @@ export default function ProfilesScreen() {
             loadProfiles();
         }, [])
     );
-
-    // Fonction pour formater la date
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
 
     // Fonction pour obtenir la couleur du badge selon le rôle
     const getRoleBadgeStyle = (role: string) => {
@@ -176,7 +165,7 @@ export default function ProfilesScreen() {
                                 <Text style={styles.roleText}>{getRoleLabel(profile.role)}</Text>
                             </View>
                             <Text style={styles.dateText}>
-                                {formatDate(profile.created_at)}
+                                {formatDateTime(profile.created_at)}
                             </Text>
                         </View>
 
