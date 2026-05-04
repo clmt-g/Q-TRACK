@@ -10,12 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
-const STATUTS = [
-    { value: 'prevue',   label: 'Prévue',   color: '#60A5FA', icon: 'calendar' },
-    { value: 'en_cours', label: 'En cours', color: '#F59E0B', icon: 'time' },
-    { value: 'terminee', label: 'Terminée', color: '#10B981', icon: 'checkmark-circle' },
-] as const;
+import { STATUTS } from '@/constants/actionCorrectives';
 
 export default function ActionCorrectiveCreateScreen() {
     const router = useRouter();
