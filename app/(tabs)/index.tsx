@@ -158,6 +158,22 @@ export default function HomeScreen() {
                     </View>
                     <Ionicons name="chevron-forward" size={24} color="#555" />
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.actionCard}
+                    onPress={() => router.push('/stats/statistiques' as any)}
+                >
+                    <View style={[styles.actionIcon, { backgroundColor: '#06524615' }]}>
+                        <Ionicons name="bar-chart" size={28} color="#10B981" />
+                    </View>
+                    <View style={styles.actionContent}>
+                        <Text style={globalStyles.cardTitle}>Statistiques</Text>
+                        <Text style={globalStyles.cardDescription}>
+                            Consulter les indicateurs de performance
+                        </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={24} color="#555" />
+                </TouchableOpacity>
             </View>
 
             {/* Recent Incidents */}
