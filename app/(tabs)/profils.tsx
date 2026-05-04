@@ -1,15 +1,14 @@
 // app/(tabs)/profils.tsx
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {globalStyles, colors} from '@/styles/theme';
 import {useProfile} from "@/hooks/useProfile";
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {useFocusEffect, useRouter} from "expo-router";
 import {useAuth} from "@/contexts/AuthContext";
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import {supabase} from "@/utils/supabase";
 
 export default function ProfilesScreen() {
     const router = useRouter();

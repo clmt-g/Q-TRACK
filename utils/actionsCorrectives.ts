@@ -18,17 +18,3 @@ export const getStatutConfig = (statut: string) => {
             return { badge: { backgroundColor: '#1E3A8A', borderColor: '#60A5FA' }, color: '#60A5FA', label: statut,     icon: 'help-circle' };
     }
 };
-
-/**
- * Formats a date string to a more readable format (dd/mm/yyyy).
- * @param dateString
- */
-export const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Non renseignée';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    });
-};

@@ -8,7 +8,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
-import { getStatutStyle, formatDate } from '@/utils/incidents';
+import { getStatutStyle } from '@/utils/incidents';
+import { formatDateTime } from '@/utils/date';
 
 // === Constants for the filters ===
 // Statuts disponibles
@@ -234,7 +235,7 @@ export default function IncidentsScreen() {
                                     <Ionicons name={icon as any} size={13} color={color} />
                                     <Text style={[styles.statutText, { color }]}>{label}</Text>
                                 </View>
-                                <Text style={styles.dateText}>{formatDate(incident.date_declaration)}</Text>
+                                <Text style={styles.dateText}>{formatDateTime(incident.date_declaration)}</Text>
                             </View>
 
                             {/* Type d'incident */}

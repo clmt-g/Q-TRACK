@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
+import { formatDate } from '@/utils/date';
 
 export default function TypeIncidentsScreen() {
     const router = useRouter();
@@ -16,15 +17,6 @@ export default function TypeIncidentsScreen() {
             loadTypesIncidents();
         }, [])
     );
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
 
     const handleDelete = (id: number, libelle: string) => {
         Alert.alert(

@@ -11,7 +11,8 @@ import LoadingState from "@/components/loading";
 import {useCallback} from "react";
 import {useIncident} from "@/hooks/useIncident";
 import {useTypeIncident} from "@/hooks/useTypeIncident";
-import {getStatutStyle, formatDate} from "@/utils/incidents";
+import {getStatutStyle } from "@/utils/incidents";
+import { formatDateTime } from "@/utils/date";
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -173,7 +174,7 @@ export default function HomeScreen() {
                                         <Ionicons name={icon as any} size={13} color={color} />
                                         <Text style={[styles.statusText, { color }]}>{label}</Text>
                                     </View>
-                                    <Text style={styles.incidentDate}>{formatDate(incident.date_declaration)}</Text>
+                                    <Text style={styles.incidentDate}>{formatDateTime(incident.date_declaration)}</Text>
                                 </View>
                                 <Text style={[globalStyles.cardTitle, globalStyles.mt8]}>{incident.description}</Text>
                                 <Text style={globalStyles.cardDescription}>Type : {incident.types_incidents?.libelle ?? 'Non défini'}</Text>

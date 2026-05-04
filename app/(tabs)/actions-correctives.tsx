@@ -9,7 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { ActionCorrective } from '@/services/ActionCorrectiveService';
-import { formatDate, getStatutConfig } from '@/utils/actionsCorrectives';
+import { getStatutConfig } from '@/utils/actionsCorrectives';
+import { formatDate } from '@/utils/date';
 
 // === Constants for filtres ===
 const STATUTS = [
