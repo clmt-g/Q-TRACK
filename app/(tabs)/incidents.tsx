@@ -285,7 +285,7 @@ export default function IncidentsScreen() {
 
                                 <TouchableOpacity
                                     style={styles.actionButton}
-                                    onPress={() => console.log('todo')}
+                                    onPress={() => router.push(`/actions-correctives/create?id=${incident.id_incident}` as any)}
                                 >
                                     <Ionicons name="build-outline" size={18} color="#10B981" />
                                     <Text style={styles.actionButtonText}>Action corrective</Text>

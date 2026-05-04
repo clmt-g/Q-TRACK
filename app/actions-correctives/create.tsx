@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import {useLocalSearchParams, useRouter} from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
 import { useActionCorrective } from '@/hooks/useActionCorrective';
@@ -18,6 +18,8 @@ export default function ActionCorrectiveCreateScreen() {
     const { session } = useAuth();
     const { createActionCorrective, loading, error } = useActionCorrective();
     const { incidents, loadIncidents } = useIncident();
+    const { id } = useLocalSearchParams();
+    const incidentId = id ? Number(id) : null;
 
     const [date, setDate] = useState<Date>(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -25,7 +27,7 @@ export default function ActionCorrectiveCreateScreen() {
     const [description, setDescription] = useState('');
     const [statut, setStatut] = useState<'prevue' | 'en_cours' | 'terminee'>('prevue');
     const [dateMiseEnPlace, setDateMiseEnPlace] = useState('');
-    const [selectedIncidentId, setSelectedIncidentId] = useState<number | null>(null);
+    const [selectedIncidentId, setSelectedIncidentId] = useState<number | null>(incidentId);
     const [showIncidentList, setShowIncidentList] = useState(false);
 
     const insets = useSafeAreaInsets();
