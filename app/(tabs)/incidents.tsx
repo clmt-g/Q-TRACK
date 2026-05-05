@@ -5,7 +5,6 @@ import { useIncident, Incident } from '@/hooks/useIncident';
 import { useTypeIncident } from '@/hooks/useTypeIncident';
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
@@ -31,9 +30,8 @@ const PERIODES = [
 
 export default function IncidentsScreen() {
     const router = useRouter();
-    const { session } = useAuth();
-    const { incidents, loading, error, loadIncidents, deleteIncident } = useIncident();
-    const { typesIncidents, loadTypesIncidents } = useTypeIncident();
+    const { incidents, loading: loadingIncident, error: errorIncident, loadIncidents, deleteIncident } = useIncident();
+    const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreType, setFiltreType] = useState<number | 'tous'>('tous');
@@ -91,11 +89,12 @@ export default function IncidentsScreen() {
         setFiltrePeriode('tous');
     };
 
-    if (loading) {
+    if (loadingIncident || loadingTypeIncident) {
         return <LoadingState message="Chargement des incidents..." />;
     }
 
-    if (error) {
+    if (errorIncident || errorTypeIncident) {
+        const error = errorIncident || errorTypeIncident || 'Une erreur inconnue est survenue';
         return <ErrorState error={error} onRetry={loadIncidents} />;
     }
 

@@ -16,8 +16,8 @@ import { STATUTS } from '@/constants/actionCorrectives';
 export default function ActionCorrectiveUpdateScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
-    const { actionCorrective, loadActionCorrective, updateActionCorrective, loading, error } = useActionCorrective();
-    const { incidents, loadIncidents } = useIncident();
+    const { actionCorrective, loadActionCorrective, updateActionCorrective, loading: loadingAction, error: errorAction } = useActionCorrective();
+    const { incidents, loadIncidents, loading: loadingIncident, error: errorIncident } = useIncident();
 
     const [description, setDescription] = useState('');
     const [statut, setStatut] = useState<'prevue' | 'en_cours' | 'terminee'>('prevue');
@@ -102,12 +102,13 @@ export default function ActionCorrectiveUpdateScreen() {
         );
     };
 
-    if (loading) {
+    if (loadingAction || loadingIncident) {
         return <LoadingState message="Chargement..." />;
     }
 
-    if (error || !actionCorrective) {
-        return <ErrorState error={error || 'Action corrective introuvable'} onRetry={() => loadActionCorrective(Number(id))} />;
+    if (errorIncident || errorAction || !actionCorrective) {
+        const error = errorAction ?? errorIncident ?? (!actionCorrective ? 'Action corrective introuvable' : null) ?? 'Erreur inconnue';
+        return <ErrorState error={error} onRetry={() => loadActionCorrective(Number(id))} />;
     }
 
     return (

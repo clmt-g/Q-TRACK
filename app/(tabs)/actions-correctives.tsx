@@ -5,7 +5,6 @@ import { useActionCorrective } from '@/hooks/useActionCorrective';
 import { useProfile } from '@/hooks/useProfile';
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { ActionCorrective } from '@/services/ActionCorrectiveService';
@@ -30,9 +29,8 @@ const PERIODES = [
 
 export default function ActionsCorractivesScreen() {
     const router = useRouter();
-    const { session } = useAuth();
-    const { actionsCorrectives, loading, error, loadActionsCorrectives, deleteActionCorrective } = useActionCorrective();
-    const { profiles, loadProfiles } = useProfile(session?.user?.id);
+    const { actionsCorrectives, loading: loadingActions, error: errorActions, loadActionsCorrectives, deleteActionCorrective } = useActionCorrective();
+    const { profiles, loadProfiles, loading: loadingProfile, error: errorProfile } = useProfile(undefined);
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreResponsable, setFiltreResponsable] = useState<string | 'tous'>('tous');
@@ -95,11 +93,12 @@ export default function ActionsCorractivesScreen() {
 
     const selectedResponsable = profiles?.find(p => p.id === filtreResponsable);
 
-    if (loading) {
+    if (loadingProfile || loadingActions) {
         return <LoadingState message="Chargement des actions correctives..." />;
     }
 
-    if (error) {
+    if (errorProfile || errorActions) {
+        const error = errorProfile ?? errorActions ?? 'Une erreur inconnue est survenue';
         return <ErrorState error={error} onRetry={loadActionsCorrectives} />;
     }
 

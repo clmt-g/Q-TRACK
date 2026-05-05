@@ -14,8 +14,8 @@ import { STATUTS } from '@/constants/incidents';
 export default function IncidentUpdateScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
-    const { incidents, loadIncidents, updateIncident, loading, error } = useIncident();
-    const { typesIncidents, loadTypesIncidents } = useTypeIncident();
+    const { incidents, loadIncidents, updateIncident, loading: loadingIncident, error: errorIncident } = useIncident();
+    const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
 
     const [description, setDescription] = useState('');
     const [statut, setStatut] = useState<'declare' | 'en_cours' | 'cloture'>('declare');
@@ -84,12 +84,13 @@ export default function IncidentUpdateScreen() {
         );
     };
 
-    if (loading) {
-        return <LoadingState message="Chargement..." />;
+    if (loadingTypeIncident || loadingIncident) {
+        return <LoadingState message="Enregistrement..." />;
     }
 
-    if (error || !incident) {
-        return <ErrorState error={error || 'Incident introuvable'} onRetry={loadIncidents} />;
+    if (errorIncident || errorTypeIncident) {
+        const error = errorIncident || errorTypeIncident || 'Une erreur est survenue';
+        return <ErrorState error={error} onRetry={() => router.back()} />;
     }
 
     return (

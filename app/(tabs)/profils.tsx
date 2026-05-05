@@ -5,7 +5,6 @@ import {globalStyles, colors} from '@/styles/theme';
 import {useProfile} from "@/hooks/useProfile";
 import {useCallback} from 'react';
 import {useFocusEffect, useRouter} from "expo-router";
-import {useAuth} from "@/contexts/AuthContext";
 import LoadingState from "@/components/loading";
 import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -14,8 +13,7 @@ import {getRoleBadgeStyle, getRoleLabel, getRoleIcon} from '@/utils/users';
 
 export default function ProfilesScreen() {
     const router = useRouter();
-    const {session} = useAuth();
-    const {profiles, loading, error, loadProfiles, deleteProfile} = useProfile(session?.user?.id);
+    const {profiles, loading, error, loadProfiles, deleteProfile} = useProfile(undefined);
 
     useFocusEffect(
         useCallback(() => {

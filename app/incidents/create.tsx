@@ -15,8 +15,8 @@ import ErrorState from "@/components/error";
 export default function IncidentCreateScreen() {
     const router = useRouter();
     const { session } = useAuth();
-    const { createIncident, loading, error } = useIncident();
-    const { typesIncidents, loadTypesIncidents } = useTypeIncident();
+    const { createIncident, loading: loadingIncident, error: errorIncident } = useIncident();
+    const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
 
     const [description, setDescription] = useState('');
     const [statut, setStatut] = useState<'declare' | 'en_cours' | 'cloture'>('declare');
@@ -77,11 +77,12 @@ export default function IncidentCreateScreen() {
         }
     };
 
-    if (loading) {
+    if (loadingTypeIncident || loadingIncident) {
         return <LoadingState message="Enregistrement..." />;
     }
 
-    if (error) {
+    if (errorIncident || errorTypeIncident) {
+        const error = errorIncident || errorTypeIncident || 'Une erreur est survenue';
         return <ErrorState error={error} onRetry={() => router.back()} />;
     }
 

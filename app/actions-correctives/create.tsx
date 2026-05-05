@@ -15,9 +15,9 @@ import ErrorState from "@/components/error";
 
 export default function ActionCorrectiveCreateScreen() {
     const router = useRouter();
-    const { session } = useAuth();
-    const { createActionCorrective, loading, error } = useActionCorrective();
-    const { incidents, loadIncidents } = useIncident();
+    const { session, error: errorAuth, isLoading: loadingAuth } = useAuth();
+    const { createActionCorrective, loading: loadingAction, error: errorAction } = useActionCorrective();
+    const { incidents, loadIncidents, loading: loadingIncident, error: errorIncident } = useIncident();
     const { id } = useLocalSearchParams();
     const incidentId = id ? Number(id) : null;
 
@@ -52,7 +52,7 @@ export default function ActionCorrectiveCreateScreen() {
         }
 
         if (!session?.user?.id) {
-            Alert.alert('Erreur', 'Session invalide, veuillez vous reconnecter');
+            Alert.alert('Erreur', 'Utilisateur non authentifié');
             return;
         }
 
@@ -90,11 +90,12 @@ export default function ActionCorrectiveCreateScreen() {
         }
     };
 
-    if (loading) {
+    if (loadingAuth || loadingIncident || loadingAction) {
         return <LoadingState message="Enregistrement..." />;
     }
 
-    if (error) {
+    if (errorAuth || errorIncident || errorAction) {
+        const error = errorAuth ?? errorIncident ?? errorAction ?? 'Erreur inconnue';
         return <ErrorState error={error || 'Action corrective introuvable'} onRetry={() => router.back()} />;
     }
 
