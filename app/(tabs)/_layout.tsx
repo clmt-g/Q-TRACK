@@ -1,12 +1,23 @@
 // app/(tabs)/_layout.tsx
-import { Tabs } from 'expo-router';
+import {Tabs, useRouter} from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
+import { useAuth } from '@/contexts/AuthContext';
+import {useEffect} from "react";
 
 export default function TabsLayout() {
+    const router = useRouter();
+    const { isLoggedIn } = useAuth();
     const insets = useSafeAreaInsets();
+
+    // redirect to the login page if not authenticated
+    useEffect(() => {
+        if (!isLoggedIn) {
+            router.replace('/login');
+        }
+    }, [isLoggedIn]);
 
     return (
         <Tabs

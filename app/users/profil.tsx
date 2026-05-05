@@ -5,18 +5,17 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/utils/supabase';
 import {useProfile} from "@/hooks/useProfile";
-import {useCallback, useEffect} from "react";
+import {useCallback} from "react";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
     const router = useRouter();
-    const { session } = useAuth();
+    const { session, logout } = useAuth();
     const insets = useSafeAreaInsets();
-    const { profile, loadProfile, loading, error } = useProfile(session?.user?.id);
+    const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
 
     useFocusEffect(
         useCallback(() => {
@@ -38,8 +37,7 @@ export default function ProfileScreen() {
                     text: 'Déconnexion',
                     style: 'destructive',
                     onPress: async () => {
-                        await supabase.auth.signOut();
-                        router.replace('/login');
+                        await logout();
                     }
                 }
             ]
@@ -47,13 +45,13 @@ export default function ProfileScreen() {
     };
 
     // Afficher le loading
-    if (loading) {
+    if (loadingProfile) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
     // Afficher l'erreur
-    if (error) {
-        return <ErrorState error={error} onRetry={loadProfile} />;
+    if (errorProfile) {
+        return <ErrorState error={errorProfile} onRetry={loadProfile} />;
     }
 
     return (

@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/utils/supabase';
 import { useProfile } from "@/hooks/useProfile";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
@@ -16,10 +15,10 @@ import { formatDateTime } from "@/utils/date";
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { session } = useAuth();
+    const { session, logout } = useAuth();
     const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
     const { incidents, loading: loadingIncidents, error: errorIncidents, loadIncidents } = useIncident();
-    const { typesIncidents, loadTypesIncidents } = useTypeIncident();
+    const { typesIncidents, loading: loadingTypes, error: errorTypes, loadTypesIncidents } = useTypeIncident();
 
     useFocusEffect(
         useCallback(() => {
@@ -42,8 +41,7 @@ export default function HomeScreen() {
                     text: 'Déconnexion',
                     style: 'destructive',
                     onPress: async () => {
-                        await supabase.auth.signOut();
-                        router.replace('/login');
+                        await logout();
                     }
                 }
             ]
@@ -51,14 +49,19 @@ export default function HomeScreen() {
     };
 
     // Afficher le loading
-    if (loadingProfile || loadingIncidents) {
+    if (loadingProfile || loadingIncidents || loadingTypes) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
     // Afficher l'erreur
-    if (errorProfile || errorIncidents) {
-        const error = errorProfile ?? errorIncidents ?? 'Une erreur est survenue';
-        return <ErrorState error={error} onRetry={loadProfile} />;
+    if (errorProfile || errorIncidents || errorTypes) {
+        const error = errorProfile ?? errorIncidents ?? errorTypes ?? 'Une erreur est survenue';
+        const retry = errorProfile
+            ? loadProfile
+            : errorIncidents
+                ? loadIncidents
+                : loadTypesIncidents;
+        return <ErrorState error={error} onRetry={retry} />;
     }
 
     return (

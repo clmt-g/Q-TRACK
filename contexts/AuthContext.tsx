@@ -9,6 +9,7 @@ interface AuthContextType {
     isLoggedIn: boolean;
     isLoading: boolean;
     session?: Session | null;
+    error?: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [session, setSession] = useState<Session | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         checkAuth(); // vérifier l'état d'authentification au montage
@@ -40,8 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const token = await AsyncStorage.getItem('userToken');
             setIsLoggedIn(!!token); // si token existe, l'utilisateur est connecté
-        } catch (error) {
-            console.error('Error checking auth:', error);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(message);
         } finally {
             setIsLoading(false); // fin du chargement
         }
@@ -58,6 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: email,
             password: password,
         });
+
+        // error handling
+        if (error) {
+            setError(error.message);
+            return;
+        }
 
         // sauvegarder le token et l'état de connexion
         if (data.session) {
@@ -80,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, error, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
