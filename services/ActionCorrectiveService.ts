@@ -107,13 +107,15 @@ class ActionCorrectiveService {
      * @param id_responsable
      * @param statut
      * @param id_incident
+     * @param date_mise_en_place
      */
     async updateActionCorrective(
         id: number,
         description: string,
         id_responsable: string,
         statut: string,
-        id_incident: number
+        id_incident: number,
+        date_mise_en_place: string
     ): Promise<ActionCorrective> {
         const { data, error } = await supabase.rpc('update_action_corrective', {
             p_id: id,
@@ -121,6 +123,7 @@ class ActionCorrectiveService {
             p_id_responsable: id_responsable,
             p_statut: statut,
             p_id_incident: id_incident,
+            p_date_mise_en_place: date_mise_en_place,
         });
 
         if (error) {

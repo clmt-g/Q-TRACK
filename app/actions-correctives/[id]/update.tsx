@@ -72,7 +72,8 @@ export default function ActionCorrectiveUpdateScreen() {
                 description.trim(),
                 actionCorrective.id_responsable,
                 statut,
-                selectedIncidentId
+                selectedIncidentId,
+                date.toISOString()
             );
 
             if (result) {

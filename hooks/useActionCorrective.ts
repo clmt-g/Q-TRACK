@@ -91,13 +91,15 @@ export function useActionCorrective() {
      * @param id_responsable
      * @param statut
      * @param id_incident
+     * @param date_mise_en_place
      */
     const updateActionCorrective = async (
         id: number,
         description: string,
         id_responsable: string,
         statut: string,
-        id_incident: number
+        id_incident: number,
+        date_mise_en_place: string
     ) => {
         try {
             setLoading(true);
@@ -107,7 +109,8 @@ export function useActionCorrective() {
                 description,
                 id_responsable,
                 statut,
-                id_incident
+                id_incident,
+                date_mise_en_place
             );
             if (data) {
                 setActionsCorrectives(prev => prev.map(a => a.id_action === id ? data : a));
