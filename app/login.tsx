@@ -1,10 +1,11 @@
 // app/login.tsx
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, AppState } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, AppState } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { supabase } from '@/utils/supabase';
-import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
+import {useRouter} from "expo-router";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -23,51 +24,22 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { login, error, isLoggedIn } = useAuth();
     const router = useRouter();
 
     async function signInWithEmail() {
-        if (!email || !password) {
-            Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-            return;
-        }
+        if (!email || !password) return;
 
         setLoading(true);
-        const { error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        });
+        await login(email, password);
+        setLoading(false);
+    }
 
-        if (error) {
-            Alert.alert('Erreur de connexion', error.message);
-        } else {
-            // Redirection automatique gérée par l'écouteur d'auth dans _layout.tsx
+    useEffect(() => {
+        if (isLoggedIn) {
             router.replace('/(tabs)');
         }
-        setLoading(false);
-    }
-
-    async function signUpWithEmail() {
-        if (!email || !password) {
-            Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-            return;
-        }
-
-        setLoading(true);
-        const {
-            data: { session },
-            error,
-        } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-        });
-
-        if (error) {
-            Alert.alert('Erreur d\'inscription', error.message);
-        } else if (!session) {
-            Alert.alert('Vérification email', 'Veuillez vérifier votre boîte mail pour confirmer votre inscription !');
-        }
-        setLoading(false);
-    }
+    }, [isLoggedIn]);
 
     return (
         <KeyboardAvoidingView
@@ -87,6 +59,14 @@ export default function LoginScreen() {
                 {/* Login Form */}
                 <View style={styles.formContainer}>
                     <Text style={globalStyles.sectionTitle}>Connexion</Text>
+
+                    {/* Error message */}
+                    {error && (
+                        <View style={styles.errorContainer}>
+                            <Ionicons name="alert-circle-outline" size={16} color={colors.error} />
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    )}
 
                     {/* Email Input */}
                     <View style={styles.inputContainer}>
@@ -142,24 +122,6 @@ export default function LoginScreen() {
                     >
                         <Text style={globalStyles.buttonText}>
                             {loading ? 'Connexion...' : 'Se connecter'}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {/* Divider */}
-                    <View style={styles.divider}>
-                        <View style={styles.dividerLine} />
-                        <Text style={styles.dividerText}>ou</Text>
-                        <View style={styles.dividerLine} />
-                    </View>
-
-                    {/* Sign Up Button */}
-                    <TouchableOpacity
-                        style={[globalStyles.button, globalStyles.buttonSecondary, loading && { opacity: 0.6 }]}
-                        onPress={signUpWithEmail}
-                        disabled={loading}
-                    >
-                        <Text style={globalStyles.buttonText}>
-                            {loading ? 'Inscription...' : 'Créer un compte'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -245,21 +207,22 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 
-    // Divider
-    divider: {
+    // Error
+    errorContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 24,
+        gap: 8,
+        backgroundColor: colors.background,
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: colors.error,
     },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: colors.border,
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: colors.textMuted,
+    errorText: {
+        color: colors.error,
         fontSize: 14,
+        flex: 1,
     },
 
     // Info Banner

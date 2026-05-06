@@ -27,9 +27,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         checkAuth(); // vérifier l'état d'authentification au montage
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setIsLoggedIn(!!session);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event !== 'SIGNED_IN') {
+                setSession(session);
+                setIsLoggedIn(!!session);
+            }
         });
 
         return () => subscription.unsubscribe();
@@ -57,25 +59,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
      */
     const login = async (email: string, password: string) => {
         // Appeler API
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
         });
 
         // error handling
-        if (error) {
-            setError(error.message);
+        if (authError) {
+            setError(authError.message);
+            return;
+        }
+
+        // fetch the user profile to check if the user is not deleted
+        const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user?.id)
+            .is('deleted_at', null)
+            .maybeSingle();
+
+        if (!profileData) {
+            setError('Ce compte a été désactivé');
             return;
         }
 
         // sauvegarder le token et l'état de connexion
-        if (data.session) {
-            setSession(data.session);
-            await AsyncStorage.setItem('userToken', data.session.access_token);
+        if (authData.session) {
+            setSession(authData.session);
+            await AsyncStorage.setItem('userToken', authData.session.access_token);
             await AsyncStorage.setItem('userEmail', email);
             setIsLoggedIn(true);
         }
-    };
+    }
 
     /**
      * logout function

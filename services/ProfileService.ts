@@ -24,7 +24,7 @@ class ProfileService {
             .select('*')
             .eq('id', userId)
             .is('deleted_at', null)
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new Error(`Error fetching the user: ${error.message}` );
