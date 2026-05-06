@@ -26,7 +26,6 @@ export default function ActionCorrectiveCreateScreen() {
 
     const [description, setDescription] = useState('');
     const [statut, setStatut] = useState<'prevue' | 'en_cours' | 'terminee'>('prevue');
-    const [dateMiseEnPlace, setDateMiseEnPlace] = useState('');
     const [selectedIncidentId, setSelectedIncidentId] = useState<number | null>(incidentId);
     const [showIncidentList, setShowIncidentList] = useState(false);
 
@@ -59,7 +58,7 @@ export default function ActionCorrectiveCreateScreen() {
         const result = await createActionCorrective(
             description.trim(),
             session.user.id,
-            dateMiseEnPlace || new Date().toISOString(),
+            date.toISOString(),
             statut,
             selectedIncidentId
         );
