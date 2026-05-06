@@ -37,6 +37,7 @@ export default function IncidentsScreen() {
     const [filtreType, setFiltreType] = useState<number | 'tous'>('tous');
     const [filtrePeriode, setFiltrePeriode] = useState('tous');
     const [showFilters, setShowFilters] = useState(false);
+    const [autres, setAutres] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -55,13 +56,18 @@ export default function IncidentsScreen() {
         return diff <= (ms[filtrePeriode as keyof typeof ms] ?? Infinity);
     };
 
+    // Apply the filters to the incidents list
+    const typesConnus = new Set(typesIncidents.map(t => t.id_type_incident));
+
     const incidentsFiltres = incidents
         .filter(i => filtreStatut === 'tous' || i.statut === filtreStatut)
-        .filter(i => filtreType === 'tous' || i.id_type_incident === filtreType)
+        .filter(i => {
+            if (autres) return !typesConnus.has(i.id_type_incident);
+            return filtreType === 'tous' || i.id_type_incident === filtreType;
+        })
         .filter(filterByPeriode);
 
-    const hasActiveFilters = filtreStatut !== 'tous' || filtreType !== 'tous' || filtrePeriode !== 'tous';
-
+    const hasActiveFilters = filtreStatut !== 'tous' || filtreType !== 'tous' || filtrePeriode !== 'tous' || autres;
     const handleDelete = (id: number) => {
         Alert.alert(
             'Suppression',
@@ -87,6 +93,7 @@ export default function IncidentsScreen() {
         setFiltreStatut('tous');
         setFiltreType('tous');
         setFiltrePeriode('tous');
+        setAutres(false);
     };
 
     if (loadingIncident || loadingTypeIncident) {
@@ -173,24 +180,35 @@ export default function IncidentsScreen() {
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         <View style={styles.filterRow}>
                             <TouchableOpacity
-                                style={[styles.filterChip, filtreType === 'tous' && styles.filterChipActive]}
-                                onPress={() => setFiltreType('tous')}
+                                style={[styles.filterChip, filtreType === 'tous' && !autres && styles.filterChipActive]}
+                                onPress={() => { setFiltreType('tous'); setAutres(false); }}
                             >
-                                <Text style={[styles.filterChipText, filtreType === 'tous' && styles.filterChipTextActive]}>
+                                <Text style={[styles.filterChipText, filtreType === 'tous' && !autres && styles.filterChipTextActive]}>
                                     Tous
                                 </Text>
                             </TouchableOpacity>
                             {typesIncidents.filter(t => t.actif).map(t => (
                                 <TouchableOpacity
                                     key={t.id_type_incident}
-                                    style={[styles.filterChip, filtreType === t.id_type_incident && styles.filterChipActive]}
-                                    onPress={() => setFiltreType(t.id_type_incident)}
+                                    style={[styles.filterChip, filtreType === t.id_type_incident && !autres && styles.filterChipActive]}
+                                    onPress={() => { setFiltreType(t.id_type_incident); setAutres(false); }}
                                 >
-                                    <Text style={[styles.filterChipText, filtreType === t.id_type_incident && styles.filterChipTextActive]}>
+                                    <Text style={[styles.filterChipText, filtreType === t.id_type_incident && !autres && styles.filterChipTextActive]}>
                                         {t.libelle}
                                     </Text>
                                 </TouchableOpacity>
                             ))}
+                            <TouchableOpacity
+                                style={[styles.filterChip, autres && styles.filterChipActive]}
+                                onPress={() => {
+                                    setAutres(!autres);
+                                    setFiltreType('tous'); // reset le filtre type pour éviter les conflits
+                                }}
+                            >
+                                <Text style={[styles.filterChipText, autres && styles.filterChipTextActive]}>
+                                    Autres
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     </ScrollView>
 
