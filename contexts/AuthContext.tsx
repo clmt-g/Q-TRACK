@@ -12,6 +12,7 @@ interface AuthContextType {
     error?: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    role: 'operateur' | 'qualite' | 'admin' | 'direction' | null;
 }
 
 // création du contexte
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const [session, setSession] = useState<Session | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [role, setRole] = useState<'operateur' | 'qualite' | 'admin' | 'direction' | null>(null);
 
     useEffect(() => {
         checkAuth(); // vérifier l'état d'authentification au montage
@@ -42,13 +44,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
      */
     const checkAuth = async () => {
         try {
-            const token = await AsyncStorage.getItem('userToken');
-            setIsLoggedIn(!!token); // si token existe, l'utilisateur est connecté
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                // Set the session property
+                setSession(session);
+
+                // Make sure the token is valid, if its the case the user is logged in
+                const token = await AsyncStorage.getItem('userToken');
+                const loggedIn = !!token;
+                setIsLoggedIn(loggedIn);
+
+                // Only load the role if the user is logged in
+                if (loggedIn) {
+                    const { data: profileData } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .is('deleted_at', null)
+                        .maybeSingle();
+
+                    setRole(profileData?.role ?? null);
+                }
+            }
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
         } finally {
-            setIsLoading(false); // fin du chargement
+            setIsLoading(false);
         }
     };
 
@@ -83,6 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
+        // set the role constant to the value of the role of the user
+        setRole(profileData.role);
+
         // sauvegarder le token et l'état de connexion
         if (authData.session) {
             setSession(authData.session);
@@ -101,10 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await AsyncStorage.removeItem('userEmail');
         setSession(null);
         setIsLoggedIn(false);
+        setRole(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, error, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, error, login, logout, role }}>
             {children}
         </AuthContext.Provider>
     );
