@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // Set the session property
                 setSession(session);
 
-                // Make sure the token is valid, if its the case the user is logged in
+                // Make sure the token is valid, if it's the case the user is logged in
                 const token = await AsyncStorage.getItem('userToken');
                 const loggedIn = !!token;
                 setIsLoggedIn(loggedIn);

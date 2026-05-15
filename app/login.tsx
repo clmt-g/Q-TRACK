@@ -37,6 +37,7 @@ export default function LoginScreen() {
 
     useEffect(() => {
         if (isLoggedIn) {
+            clearError();
             router.replace('/(tabs)');
         }
     }, [isLoggedIn]);
