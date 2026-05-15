@@ -129,6 +129,7 @@ class ActionCorrectiveService {
         if (error) {
             throw new Error(`Error occured while updating action corrective: ${error.message}`);
         }
+        if (!data) throw new Error('Action corrective introuvable ou accès refusé');
 
         return data;
     }

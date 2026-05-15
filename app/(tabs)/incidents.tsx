@@ -237,13 +237,14 @@ export default function IncidentsScreen() {
                 <View style={styles.sectionHeader}>
                     <Text style={globalStyles.sectionTitle}>Liste des incidents</Text>
 
-                    {/* No role filter here, everyone can submit an incident */}
-                    <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={() => router.push('/incidents/create' as any)}
-                    >
-                        <Ionicons name="add" size={20} color="#fff" />
-                    </TouchableOpacity>
+                    {role && ['admin', 'qualite', 'operateur'].includes(role) && (
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => router.push('/incidents/create' as any)}
+                        >
+                            <Ionicons name="add" size={20} color="#fff" />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {incidentsFiltres.map((incident) => {
@@ -301,21 +302,25 @@ export default function IncidentsScreen() {
                                     </TouchableOpacity>
                                 )}
 
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => handleDelete(incident.id_incident)}
-                                >
-                                    <Ionicons name="trash-outline" size={18} color="#C32D2D" />
-                                    <Text style={styles.actionButtonText}>Supprimer</Text>
-                                </TouchableOpacity>
+                                {role && ['admin', 'qualite'].includes(role) && (
+                                    <TouchableOpacity
+                                        style={styles.actionButton}
+                                        onPress={() => handleDelete(incident.id_incident)}
+                                    >
+                                        <Ionicons name="trash-outline" size={18} color="#C32D2D" />
+                                        <Text style={styles.actionButtonText}>Supprimer</Text>
+                                    </TouchableOpacity>
+                                )}
 
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => router.push(`/actions-correctives/create?id=${incident.id_incident}` as any)}
-                                >
-                                    <Ionicons name="build-outline" size={18} color="#10B981" />
-                                    <Text style={styles.actionButtonText}>Action corrective</Text>
-                                </TouchableOpacity>
+                                {role && ['admin', 'qualite'].includes(role) && (
+                                    <TouchableOpacity
+                                        style={styles.actionButton}
+                                        onPress={() => router.push(`/actions-correctives/create?id=${incident.id_incident}` as any)}
+                                    >
+                                        <Ionicons name="build-outline" size={18} color="#10B981" />
+                                        <Text style={styles.actionButtonText}>Action corrective</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         </View>
                     );

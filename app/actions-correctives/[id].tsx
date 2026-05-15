@@ -10,12 +10,14 @@ import ErrorState from '@/components/error';
 import { getStatutConfig } from '@/utils/actionsCorrectives';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getStatutStyle } from '@/utils/incidents';
+import {useAuth} from "@/contexts/AuthContext";
 
 export default function ActionCorrectiveDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { actionCorrective, loadActionCorrective, loading, error } = useActionCorrective();
+    const { actionCorrective, loadActionCorrective, loading: loadingAction, error: errorAction } = useActionCorrective();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
 
     useFocusEffect(
         useCallback(() => {
@@ -23,12 +25,13 @@ export default function ActionCorrectiveDetailScreen() {
         }, [])
     );
 
-    if (loading) {
+    if (loadingAction || loadingAuth) {
         return <LoadingState message="Chargement de l'action corrective..." />;
     }
 
-    if (error || !actionCorrective) {
-        return <ErrorState error={error || 'Action corrective introuvable'} onRetry={() => loadActionCorrective(Number(id))} />;
+    if (errorAuth || errorAuth || !actionCorrective) {
+        const error = errorAuth ?? errorAction ?? 'Une erreur est survenue';
+        return <ErrorState error={error} onRetry={() => loadActionCorrective(Number(id))} />;
     }
 
     const { badge, color, label, icon } = getStatutConfig(actionCorrective.statut);
@@ -195,24 +198,26 @@ export default function ActionCorrectiveDetailScreen() {
                 </View>
             )}
 
-            {/* Bouton modifier */}
-            <View style={styles.actionsContainer}>
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => router.push(`/actions-correctives/${id}/update` as any)}
-                >
-                    <Ionicons name="create-outline" size={20} color="#fff" />
-                    <Text style={styles.editButtonText}>Modifier</Text>
-                </TouchableOpacity>
+            {/* Boutons */}
+            {role && ['admin', 'qualite'].includes(role) && (
+                <View style={styles.actionsContainer}>
+                    <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => router.push(`/actions-correctives/${id}/update` as any)}
+                    >
+                        <Ionicons name="create-outline" size={20} color="#fff" />
+                        <Text style={styles.editButtonText}>Modifier</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.incidentButton}
-                    onPress={() => router.push(`/incidents/${actionCorrective.id_incident}` as any)}
-                >
-                    <Ionicons name="warning-outline" size={20} color="#F59E0B" />
-                    <Text style={[styles.incidentButtonText, { color: '#F59E0B' }]}>Voir l&apos;incident</Text>
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity
+                        style={styles.incidentButton}
+                        onPress={() => router.push(`/incidents/${actionCorrective.id_incident}` as any)}
+                    >
+                        <Ionicons name="warning-outline" size={20} color="#F59E0B" />
+                        <Text style={[styles.incidentButtonText, { color: '#F59E0B' }]}>Voir l&apos;incident</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </ScrollView>
     );
 }

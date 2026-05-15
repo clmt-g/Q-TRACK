@@ -15,7 +15,7 @@ import { formatDateTime } from "@/utils/date";
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { session, logout } = useAuth();
+    const { session, logout, role, isLoading: loadingAuth, error: errorAuth } = useAuth();
     const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
     const { incidents, loading: loadingIncidents, error: errorIncidents, loadIncidents } = useIncident();
     const { typesIncidents, loading: loadingTypes, error: errorTypes, loadTypesIncidents } = useTypeIncident();
@@ -49,13 +49,13 @@ export default function HomeScreen() {
     };
 
     // Afficher le loading
-    if (loadingProfile || loadingIncidents || loadingTypes) {
+    if (loadingProfile || loadingIncidents || loadingTypes || loadingAuth) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
     // Afficher l'erreur
-    if (errorProfile || errorIncidents || errorTypes) {
-        const error = errorProfile ?? errorIncidents ?? errorTypes ?? 'Une erreur est survenue';
+    if (errorProfile || errorIncidents || errorTypes || errorAuth) {
+        const error = errorAuth ?? errorProfile ?? errorIncidents ?? errorTypes ?? 'Une erreur est survenue';
         const retry = errorProfile
             ? loadProfile
             : errorIncidents
@@ -114,21 +114,23 @@ export default function HomeScreen() {
             <View style={globalStyles.section}>
                 <Text style={globalStyles.sectionTitle}>Actions rapides</Text>
 
-                <TouchableOpacity
-                    style={styles.actionCard}
-                    onPress={() => router.push('/incidents/create' as any)}
-                >
-                    <View style={[styles.actionIcon, { backgroundColor: '#1E3A8A15' }]}>
-                        <Ionicons name="add-circle" size={28} color="#60A5FA" />
-                    </View>
-                    <View style={styles.actionContent}>
-                        <Text style={globalStyles.cardTitle}>Déclarer un incident</Text>
-                        <Text style={globalStyles.cardDescription}>
-                            Signaler un problème qualité rapidement
-                        </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={24} color="#555" />
-                </TouchableOpacity>
+                {role && ['admin', 'operateur', 'qualite'].includes(role) && (
+                    <TouchableOpacity
+                        style={styles.actionCard}
+                        onPress={() => router.push('/incidents/create' as any)}
+                    >
+                        <View style={[styles.actionIcon, { backgroundColor: '#1E3A8A15' }]}>
+                            <Ionicons name="add-circle" size={28} color="#60A5FA" />
+                        </View>
+                        <View style={styles.actionContent}>
+                            <Text style={globalStyles.cardTitle}>Déclarer un incident</Text>
+                            <Text style={globalStyles.cardDescription}>
+                                Signaler un problème qualité rapidement
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={24} color="#555" />
+                    </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                     style={styles.actionCard}
@@ -146,37 +148,41 @@ export default function HomeScreen() {
                     <Ionicons name="chevron-forward" size={24} color="#555" />
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.actionCard}
-                    onPress={() => router.push('./actions-correctives' as any)}
-                >
-                    <View style={[styles.actionIcon, { backgroundColor: '#EA580C15' }]}>
-                        <Ionicons name="construct" size={28} color="#FB923C" />
-                    </View>
-                    <View style={styles.actionContent}>
-                        <Text style={globalStyles.cardTitle}>Actions correctives</Text>
-                        <Text style={globalStyles.cardDescription}>
-                            Suivre les mesures en cours
-                        </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={24} color="#555" />
-                </TouchableOpacity>
+                {role && ['admin', 'qualite', 'direction'].includes(role) && (
+                    <TouchableOpacity
+                        style={styles.actionCard}
+                        onPress={() => router.push('./actions-correctives' as any)}
+                    >
+                        <View style={[styles.actionIcon, { backgroundColor: '#EA580C15' }]}>
+                            <Ionicons name="construct" size={28} color="#FB923C" />
+                        </View>
+                        <View style={styles.actionContent}>
+                            <Text style={globalStyles.cardTitle}>Actions correctives</Text>
+                            <Text style={globalStyles.cardDescription}>
+                                Suivre les mesures en cours
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={24} color="#555" />
+                    </TouchableOpacity>
+                )}
 
-                <TouchableOpacity
-                    style={styles.actionCard}
-                    onPress={() => router.push('/stats/statistiques' as any)}
-                >
-                    <View style={[styles.actionIcon, { backgroundColor: '#06524615' }]}>
-                        <Ionicons name="bar-chart" size={28} color="#10B981" />
-                    </View>
-                    <View style={styles.actionContent}>
-                        <Text style={globalStyles.cardTitle}>Statistiques</Text>
-                        <Text style={globalStyles.cardDescription}>
-                            Consulter les indicateurs de performance
-                        </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={24} color="#555" />
-                </TouchableOpacity>
+                {role && ['admin', 'qualite', 'direction'].includes(role) && (
+                    <TouchableOpacity
+                        style={styles.actionCard}
+                        onPress={() => router.push('/stats/statistiques' as any)}
+                    >
+                        <View style={[styles.actionIcon, { backgroundColor: '#06524615' }]}>
+                            <Ionicons name="bar-chart" size={28} color="#10B981" />
+                        </View>
+                        <View style={styles.actionContent}>
+                            <Text style={globalStyles.cardTitle}>Statistiques</Text>
+                            <Text style={globalStyles.cardDescription}>
+                                Consulter les indicateurs de performance
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={24} color="#555" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* Recent Incidents */}

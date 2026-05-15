@@ -50,6 +50,7 @@ class ProfileService {
         if(error) {
             throw new Error(`Error updating the user: ${error.message}` );
         }
+        if (!data) throw new Error('Utilisateur introuvable ou accès refusé');
 
         return data;
     }

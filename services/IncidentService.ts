@@ -129,7 +129,6 @@ class IncidentService {
         }
         if (!data) throw new Error('Incident introuvable ou accès refusé');
 
-
         return data;
     }
 

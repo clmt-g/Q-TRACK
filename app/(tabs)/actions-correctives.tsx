@@ -10,6 +10,7 @@ import ErrorState from '@/components/error';
 import { ActionCorrective } from '@/services/ActionCorrectiveService';
 import { getStatutConfig } from '@/utils/actionsCorrectives';
 import { formatDate } from '@/utils/date';
+import {useAuth} from "@/contexts/AuthContext";
 
 // === Constants for filtres ===
 const STATUTS = [
@@ -31,6 +32,7 @@ export default function ActionsCorractivesScreen() {
     const router = useRouter();
     const { actionsCorrectives, loading: loadingActions, error: errorActions, loadActionsCorrectives, deleteActionCorrective } = useActionCorrective();
     const { profiles, loadProfiles, loading: loadingProfile, error: errorProfile } = useProfile(undefined);
+    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreResponsable, setFiltreResponsable] = useState<string | 'tous'>('tous');
@@ -93,12 +95,12 @@ export default function ActionsCorractivesScreen() {
 
     const selectedResponsable = profiles?.find(p => p.id === filtreResponsable);
 
-    if (loadingProfile || loadingActions) {
+    if (loadingProfile || loadingActions || loadingAuth) {
         return <LoadingState message="Chargement des actions correctives..." />;
     }
 
-    if (errorProfile || errorActions) {
-        const error = errorProfile ?? errorActions ?? 'Une erreur inconnue est survenue';
+    if (errorProfile || errorActions || errorActions) {
+        const error = errorProfile ?? errorAuth ?? errorActions ?? 'Une erreur inconnue est survenue';
         return <ErrorState error={error} onRetry={loadActionsCorrectives} />;
     }
 
@@ -259,12 +261,15 @@ export default function ActionsCorractivesScreen() {
             <View style={globalStyles.section}>
                 <View style={styles.sectionHeader}>
                     <Text style={globalStyles.sectionTitle}>Liste des actions</Text>
-                    <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={() => router.push('/actions-correctives/create' as any)}
-                    >
-                        <Ionicons name="add" size={20} color="#fff" />
-                    </TouchableOpacity>
+
+                    {role && ['admin', 'qualite'].includes(role) && (
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => router.push('/actions-correctives/create' as any)}
+                        >
+                            <Ionicons name="add" size={20} color="#fff" />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {actionsFiltrees.map((action) => {
@@ -318,21 +323,25 @@ export default function ActionsCorractivesScreen() {
                                     <Text style={styles.actionButtonText}>Voir</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => router.push(`/actions-correctives/${action.id_action}/update` as any)}
-                                >
-                                    <Ionicons name="create-outline" size={18} color="#F59E0B" />
-                                    <Text style={styles.actionButtonText}>Modifier</Text>
-                                </TouchableOpacity>
+                                {role && ['admin', 'qualite'].includes(role) && (
+                                    <>
+                                        <TouchableOpacity
+                                            style={styles.actionButton}
+                                            onPress={() => router.push(`/actions-correctives/${action.id_action}/update` as any)}
+                                        >
+                                            <Ionicons name="create-outline" size={18} color="#F59E0B" />
+                                            <Text style={styles.actionButtonText}>Modifier</Text>
+                                        </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => handleDelete(action.id_action)}
-                                >
-                                    <Ionicons name="trash-outline" size={18} color="#C32D2D" />
-                                    <Text style={styles.actionButtonText}>Supprimer</Text>
-                                </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.actionButton}
+                                            onPress={() => handleDelete(action.id_action)}
+                                        >
+                                            <Ionicons name="trash-outline" size={18} color="#C32D2D" />
+                                            <Text style={styles.actionButtonText}>Supprimer</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                )}
                             </View>
                         </View>
                     );

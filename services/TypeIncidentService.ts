@@ -79,6 +79,8 @@ class TypeIncidentService {
             throw new Error(`Error updating the type of incident: ${error.message}` );
         }
 
+        if (!data) throw new Error('Type d\'incident introuvable ou accès refusé');
+
         return data;
     }
 

@@ -8,19 +8,22 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import { getRoleConfig } from '@/utils/users';
+import {useAuth} from "@/contexts/AuthContext";
 
 export default function ProfileDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { profile, loading, error, loadProfile } = useProfile(id as string);
+    const { profile, loading: loadingProfile, error: errorProfile, loadProfile } = useProfile(id as string);
+    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
 
-    if (loading) {
+    if (loadingProfile || loadingAuth) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
-    if (error || !profile) {
-        return <ErrorState error={error || "Profil introuvable"} onRetry={loadProfile} />;
+    if (!profile || errorProfile || errorAuth) {
+        const error = errorAuth ?? errorProfile ?? 'Une erreur est survenue';
+        return <ErrorState error={error} onRetry={loadProfile} />;
     }
 
     const roleConfig = getRoleConfig(profile.role);
@@ -114,13 +117,15 @@ export default function ProfileDetailScreen() {
             </View>
 
             {/* Bouton modifier */}
-            <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => router.push(`/users/${id}/update` as any)}
-            >
-                <Ionicons name="create-outline" size={20} color={colors.text} />
-                <Text style={styles.editButtonText}>Modifier le profil</Text>
-            </TouchableOpacity>
+            {role && role === 'admin' && (
+                <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => router.push(`/users/${id}/update` as any)}
+                >
+                    <Ionicons name="create-outline" size={20} color={colors.text} />
+                    <Text style={styles.editButtonText}>Modifier le profil</Text>
+                </TouchableOpacity>
+            )}
         </ScrollView>
     );
 }
