@@ -24,7 +24,7 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { login, error, isLoggedIn } = useAuth();
+    const { login, error, isLoggedIn, clearError } = useAuth();
     const router = useRouter();
 
     async function signInWithEmail() {
@@ -40,6 +40,15 @@ export default function LoginScreen() {
             router.replace('/(tabs)');
         }
     }, [isLoggedIn]);
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => {
+                clearError();
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     return (
         <KeyboardAvoidingView

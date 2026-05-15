@@ -10,10 +10,12 @@ import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { formatDateTime } from '@/utils/date';
 import {getRoleBadgeStyle, getRoleLabel, getRoleIcon} from '@/utils/users';
+import {useAuth} from "@/contexts/AuthContext";
 
 export default function ProfilesScreen() {
     const router = useRouter();
-    const {profiles, loading, error, loadProfiles, deleteProfile} = useProfile(undefined);
+    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const {profiles, loading: loadingProfile, error: errorProfile, loadProfiles, deleteProfile} = useProfile(undefined);
 
     useFocusEffect(
         useCallback(() => {
@@ -46,12 +48,13 @@ export default function ProfilesScreen() {
     };
 
     // Afficher le loading
-    if (loading) {
+    if (loadingAuth || loadingProfile) {
         return <LoadingState message="Chargement des profils..."/>;
     }
 
     // Afficher l'erreur
-    if (error) {
+    if (errorAuth || errorProfile) {
+        const error = errorAuth ?? errorProfile ?? "Une erreur est survenue";
         return <ErrorState error={error} onRetry={loadProfiles}/>;
     }
 
@@ -94,12 +97,14 @@ export default function ProfilesScreen() {
             <View style={globalStyles.section}>
                 <View style={styles.sectionHeader}>
                     <Text style={globalStyles.sectionTitle}>Liste des utilisateurs</Text>
-                    <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={() => router.push('/users/create')}
-                    >
-                        <Ionicons name="person-add" size={20} color="#fff"/>
-                    </TouchableOpacity>
+                    {role === 'admin' && (
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => router.push('/users/create')}
+                        >
+                            <Ionicons name="person-add" size={20} color="#fff"/>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {profiles.map((profile) => (
@@ -134,39 +139,41 @@ export default function ProfilesScreen() {
                         </View>
 
                         {/* Actions */}
-                        <View style={styles.actionsContainer}>
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => router.push(`/users/${profile.id}` as any)}
-                            >
-                                <Ionicons name="eye-outline" size={18} color="#60A5FA"/>
-                                <Text style={styles.actionButtonText}>Voir</Text>
-                            </TouchableOpacity>
+                        {role === 'admin' && (
+                            <View style={styles.actionsContainer}>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => router.push(`/users/${profile.id}` as any)}
+                                >
+                                    <Ionicons name="eye-outline" size={18} color="#60A5FA"/>
+                                    <Text style={styles.actionButtonText}>Voir</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => router.push(`/users/${profile.id}/update` as any)}
-                            >
-                                <Ionicons name="create-outline" size={18} color="#F59E0B"/>
-                                <Text style={styles.actionButtonText}>Modifier</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => router.push(`/users/${profile.id}/update` as any)}
+                                >
+                                    <Ionicons name="create-outline" size={18} color="#F59E0B"/>
+                                    <Text style={styles.actionButtonText}>Modifier</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => router.push(`/users/${profile.id}/update-password` as any)}
-                            >
-                                <Ionicons name="key-outline" size={18} color="#10b981"/>
-                                <Text style={styles.actionButtonText}>Mot de passe</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => router.push(`/users/${profile.id}/update-password` as any)}
+                                >
+                                    <Ionicons name="key-outline" size={18} color="#10b981"/>
+                                    <Text style={styles.actionButtonText}>Mot de passe</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => handleDelete(profile.id)}
-                            >
-                                <MaterialIcons name="delete-outline" size={18} color="#C32D2D"/>
-                                <Text style={styles.actionButtonText}>Supprimer</Text>
-                            </TouchableOpacity>
-                        </View>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => handleDelete(profile.id)}
+                                >
+                                    <MaterialIcons name="delete-outline" size={18} color="#C32D2D"/>
+                                    <Text style={styles.actionButtonText}>Supprimer</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
                 ))}
 

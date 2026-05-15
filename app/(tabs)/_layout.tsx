@@ -9,7 +9,7 @@ import {useEffect} from "react";
 
 export default function TabsLayout() {
     const router = useRouter();
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, role } = useAuth();
     const insets = useSafeAreaInsets();
 
     // redirect to the login page if not authenticated
@@ -67,6 +67,7 @@ export default function TabsLayout() {
                 name="profils"
                 options={{
                     title: 'Profils',
+                    href: role === 'admin' ? '/profils' : null,
                     tabBarIcon: ({ color, size, focused }) => (
                         <Feather name="users" size={size} color={color} />
                     ),
@@ -104,6 +105,7 @@ export default function TabsLayout() {
                 name="actions-correctives"
                 options={{
                     title: 'Actions',
+                    href: role && ['admin', 'direction', 'qualite'].includes(role) ? '/actions-correctives' : null,
                     tabBarIcon: ({ color, size, focused }) => (
                         <Ionicons name="build-outline" size={size} color={color} />
                     ),

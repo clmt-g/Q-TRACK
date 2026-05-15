@@ -13,6 +13,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     role: 'operateur' | 'qualite' | 'admin' | 'direction' | null;
+    clearError: () => void;
 }
 
 // création du contexte
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [role, setRole] = useState<'operateur' | 'qualite' | 'admin' | 'direction' | null>(null);
+    const clearError = () => setError(null);
 
     useEffect(() => {
         checkAuth(); // vérifier l'état d'authentification au montage
@@ -131,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, error, login, logout, role }}>
+        <AuthContext.Provider value={{ isLoggedIn, isLoading, session, error, login, logout, role, clearError }}>
             {children}
         </AuthContext.Provider>
     );

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
     const router = useRouter();
-    const { session, logout } = useAuth();
+    const { session, logout, error: errorAuth, isLoading: loadingAuth, role } = useAuth();
     const insets = useSafeAreaInsets();
     const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
 
@@ -45,13 +45,14 @@ export default function ProfileScreen() {
     };
 
     // Afficher le loading
-    if (loadingProfile) {
+    if (loadingProfile || loadingAuth) {
         return <LoadingState message="Chargement du profil..." />;
     }
 
     // Afficher l'erreur
-    if (errorProfile) {
-        return <ErrorState error={errorProfile} onRetry={loadProfile} />;
+    if (errorProfile || errorAuth) {
+        const error = errorProfile ?? errorAuth ?? "Une erreur est survenue";
+        return <ErrorState error={error} onRetry={loadProfile} />;
     }
 
     return (
@@ -119,7 +120,9 @@ export default function ProfileScreen() {
 
             {/* Actions Section */}
             <View style={globalStyles.section}>
-                <Text style={globalStyles.sectionTitle}>Actions</Text>
+                <Text style={globalStyles.sectionTitle}>
+                    Actions
+                </Text>
 
                 <TouchableOpacity
                     style={styles.actionButton}
@@ -130,21 +133,25 @@ export default function ProfileScreen() {
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
                 </TouchableOpacity>
 
-
                 <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => router.push(`/users/${profile?.id}/update` as any)}
+                    onPress={() => router.push(`/users/${profile?.id}` as any)}
                 >
-                    <MaterialIcons name="update" size={24} color={colors.primary} />
-                    <Text style={styles.actionButtonText}>Modifier le profil</Text>
+                    <Ionicons name="eye-outline" size={24} color={colors.primary} />
+                    <Text style={styles.actionButtonText}>Voir le profil</Text>
                     <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="notifications-outline" size={24} color={colors.primary} />
-                    <Text style={styles.actionButtonText}>Notifications</Text>
-                    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-                </TouchableOpacity>
+                {role === 'admin' && (
+                    <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => router.push(`/users/${profile?.id}/update` as any)}
+                    >
+                        <MaterialIcons name="update" size={24} color={colors.primary} />
+                        <Text style={styles.actionButtonText}>Modifier le profil</Text>
+                        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* Logout Button */}
