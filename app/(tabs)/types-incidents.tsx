@@ -7,10 +7,12 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { formatDate } from '@/utils/date';
+import {useAuth} from "@/contexts/AuthContext";
 
 export default function TypeIncidentsScreen() {
     const router = useRouter();
-    const { typesIncidents, loading, error, loadTypesIncidents, deleteTypeIncident } = useTypeIncident();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { typesIncidents, loading: loadingTypesIncidents, error: errorTypesIncidents, loadTypesIncidents, deleteTypeIncident } = useTypeIncident();
 
     useFocusEffect(
         useCallback(() => {
@@ -39,11 +41,12 @@ export default function TypeIncidentsScreen() {
         );
     };
 
-    if (loading) {
+    if (loadingAuth || loadingTypesIncidents) {
         return <LoadingState message="Chargement des types d'incidents..." />;
     }
 
-    if (error) {
+    if (errorAuth || errorTypesIncidents) {
+        const error = errorAuth ?? errorTypesIncidents ?? "Une erreur est survenue";
         return <ErrorState error={error} onRetry={loadTypesIncidents} />;
     }
 
@@ -83,12 +86,15 @@ export default function TypeIncidentsScreen() {
             <View style={globalStyles.section}>
                 <View style={styles.sectionHeader}>
                     <Text style={globalStyles.sectionTitle}>Liste des types</Text>
-                    <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={() => router.push('/types-incidents/create' as any)}
-                    >
-                        <Ionicons name="add" size={20} color="#fff" />
-                    </TouchableOpacity>
+
+                    {role && ['admin', 'qualite'].includes(role) && (
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => router.push('/types-incidents/create' as any)}
+                        >
+                            <Ionicons name="add" size={20} color="#fff" />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {typesIncidents.map((type) => (
@@ -125,23 +131,25 @@ export default function TypeIncidentsScreen() {
                         </View>
 
                         {/* Actions */}
-                        <View style={styles.actionsContainer}>
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => router.push(`/types-incidents/${type.id_type_incident}/update` as any)}
-                            >
-                                <Ionicons name="create-outline" size={18} color="#F59E0B" />
-                                <Text style={styles.actionButtonText}>Modifier</Text>
-                            </TouchableOpacity>
+                        {role && ['admin', 'qualite'].includes(role) && (
+                            <View style={styles.actionsContainer}>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => router.push(`/types-incidents/${type.id_type_incident}/update` as any)}
+                                >
+                                    <Ionicons name="create-outline" size={18} color="#F59E0B" />
+                                    <Text style={styles.actionButtonText}>Modifier</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => handleDelete(type.id_type_incident, type.libelle)}
-                            >
-                                <Ionicons name="trash-outline" size={18} color="#C32D2D" />
-                                <Text style={styles.actionButtonText}>Supprimer</Text>
-                            </TouchableOpacity>
-                        </View>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => handleDelete(type.id_type_incident, type.libelle)}
+                                >
+                                    <Ionicons name="trash-outline" size={18} color="#C32D2D" />
+                                    <Text style={styles.actionButtonText}>Supprimer</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
                 ))}
 

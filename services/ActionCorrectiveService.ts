@@ -54,7 +54,7 @@ class ActionCorrectiveService {
             .select('*, profiles(nom, prenom), incidents(description, statut, types_incidents(libelle))')
             .eq('id_action', id)
             .is('deleted_at', null)
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new Error(`An error occurred while fetching the actions: ${error.message}`);

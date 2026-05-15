@@ -45,7 +45,7 @@ class ProfileService {
             .eq('id', userId)
             .is('deleted_at', null)
             .select()
-            .single();
+            .maybeSingle();
 
         if(error) {
             throw new Error(`Error updating the user: ${error.message}` );
@@ -141,7 +141,7 @@ class ProfileService {
             .select('*')
             .eq('id', userId)
             .is('deleted_at', null)
-            .single();
+            .maybeSingle();
 
         if (profileError) {
             throw new Error(`Error fetching the user: ${profileError.message}` );
@@ -184,7 +184,8 @@ class ProfileService {
             .from('profiles')
             .select('*')
             .eq('id', userId)
-            .single();
+            .is('deleted_at', null)
+            .maybeSingle();
 
         if (profileError) {
             throw new Error(`Error fetching the user: ${profileError.message}` );

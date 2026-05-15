@@ -9,6 +9,7 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
 import { formatDateTime } from '@/utils/date';
+import {useAuth} from "@/contexts/AuthContext";
 
 // === Constants for the filters ===
 // Statuts disponibles
@@ -32,6 +33,7 @@ export default function IncidentsScreen() {
     const router = useRouter();
     const { incidents, loading: loadingIncident, error: errorIncident, loadIncidents, deleteIncident } = useIncident();
     const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
+    const { role, session, isLoading: loadingAuth, error: errorAuth } = useAuth();
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreType, setFiltreType] = useState<number | 'tous'>('tous');
@@ -96,12 +98,12 @@ export default function IncidentsScreen() {
         setAutres(false);
     };
 
-    if (loadingIncident || loadingTypeIncident) {
+    if (loadingIncident || loadingTypeIncident || loadingAuth) {
         return <LoadingState message="Chargement des incidents..." />;
     }
 
-    if (errorIncident || errorTypeIncident) {
-        const error = errorIncident || errorTypeIncident || 'Une erreur inconnue est survenue';
+    if (errorIncident || errorTypeIncident || errorAuth) {
+        const error = errorAuth ?? errorIncident ?? errorTypeIncident ?? 'Une erreur inconnue est survenue';
         return <ErrorState error={error} onRetry={loadIncidents} />;
     }
 
@@ -234,6 +236,8 @@ export default function IncidentsScreen() {
             <View style={globalStyles.section}>
                 <View style={styles.sectionHeader}>
                     <Text style={globalStyles.sectionTitle}>Liste des incidents</Text>
+
+                    {/* No role filter here, everyone can submit an incident */}
                     <TouchableOpacity
                         style={styles.addButton}
                         onPress={() => router.push('/incidents/create' as any)}
@@ -284,13 +288,18 @@ export default function IncidentsScreen() {
                                     <Text style={styles.actionButtonText}>Voir</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => router.push(`/incidents/${incident.id_incident}/update` as any)}
-                                >
-                                    <Ionicons name="create-outline" size={18} color="#F59E0B" />
-                                    <Text style={styles.actionButtonText}>Modifier</Text>
-                                </TouchableOpacity>
+                                {(
+                                    (role && ['admin', 'qualite'].includes(role)) ||
+                                    (incident.id_user === session?.user?.id)
+                                ) && (
+                                    <TouchableOpacity
+                                        style={styles.actionButton}
+                                        onPress={() => router.push(`/incidents/${incident.id_incident}/update` as any)}
+                                    >
+                                        <Ionicons name="create-outline" size={18} color="#F59E0B" />
+                                        <Text style={styles.actionButtonText}>Modifier</Text>
+                                    </TouchableOpacity>
+                                )}
 
                                 <TouchableOpacity
                                     style={styles.actionButton}

@@ -54,7 +54,7 @@ class IncidentService {
             .select('*, types_incidents(libelle)')
             .eq('id_incident', id_incident)
             .is('deleted_at', null)
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new Error(`Error while fetching incident: ${error.message}`);
@@ -122,11 +122,13 @@ class IncidentService {
             .eq('id_incident', id_incident)
             .is('deleted_at', null)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new Error(`Error while updating incidents: ${error.message}`);;
         }
+        if (!data) throw new Error('Incident introuvable ou accès refusé');
+
 
         return data;
     }

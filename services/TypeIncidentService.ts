@@ -73,7 +73,7 @@ class TypeIncidentService {
             .eq('id_type_incident', id)
             .is('deleted_at', null)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new Error(`Error updating the type of incident: ${error.message}` );
