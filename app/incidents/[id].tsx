@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
@@ -10,6 +10,7 @@ import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {useAuth} from "@/contexts/AuthContext";
+import {usePdf} from "@/hooks/usePdf";
 
 export default function IncidentDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -17,6 +18,7 @@ export default function IncidentDetailScreen() {
     const insets = useSafeAreaInsets();
     const { incident, loadIncident, loading: loadingIncident, error: errorIncident } = useIncident();
     const { role, session, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { generateReport, error: errorPdf, loading: loadingPdf } = usePdf();
 
     useFocusEffect(
         useCallback(() => {
@@ -24,7 +26,7 @@ export default function IncidentDetailScreen() {
         }, [])
     );
 
-    if (loadingAuth || loadingIncident) {
+    if (loadingAuth || loadingIncident || loadingPdf) {
         return <LoadingState message="Chargement de l'incident..." />;
     }
 
@@ -32,12 +34,26 @@ export default function IncidentDetailScreen() {
         return <LoadingState message="Chargement de l'incident..." />;
     }
 
-    if (errorIncident || errorAuth) {
-        const error = errorIncident ?? errorAuth ?? "Un incident est survenue";
+    if (errorIncident || errorAuth || errorPdf) {
+        const error = errorPdf ?? errorIncident ?? errorAuth ?? "Un incident est survenue";
         return <ErrorState error={error} onRetry={() => router.back()} />;
     }
 
     const { badge, color, label, icon } = getStatutStyle(incident.statut);
+
+    /**
+     * Gère le téléchargement du rapport PDF de l'incident
+     */
+    const handleDownload = async () => {
+        Alert.alert(
+            'Télécharger le rapport',
+            `Voulez-vous télécharger le rapport de l'incident #${incident.id_incident} ?`,
+            [
+                { text: 'Annuler', style: 'cancel' },
+                { text: 'Télécharger', onPress: () => generateReport(incident.id_incident) },
+            ]
+        );
+    };
 
     return (
         <ScrollView style={globalStyles.container}>
@@ -162,6 +178,19 @@ export default function IncidentDetailScreen() {
                     >
                         <Ionicons name="build-outline" size={20} color="#10B981" />
                         <Text style={[styles.actionButtonText, { color: '#10B981' }]}>Action corrective</Text>
+                    </TouchableOpacity>
+                )}
+
+                {role && ['admin', 'qualite'].includes(role) && (
+                    <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={handleDownload}
+                        disabled={loadingPdf}
+                    >
+                        <Ionicons name="download-outline" size={20} color="#00D9FF" />
+                        <Text style={[styles.actionButtonText, { color: '#00D9FF' }]}>
+                            {loadingPdf ? 'Génération...' : 'Envoyer le rapport PDF'}
+                        </Text>
                     </TouchableOpacity>
                 )}
             </View>

@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabase";
+import {Profile} from "@/services/ProfileService";
 
 export interface Incident {
     id_incident: number;
@@ -44,7 +45,7 @@ class IncidentService {
      * Return the incident corresponding to the key id_incident
      * @param id_incident
      */
-    async getIncident(id_incident: number): Promise<Incident> {
+    async getIncident(id_incident: number): Promise<Incident & Profile> {
         if (!id_incident) {
             throw new Error('Incident id not found');
         }
