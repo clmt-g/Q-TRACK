@@ -68,36 +68,19 @@ class ProfileService {
             role: 'operateur' | 'qualite' | 'admin' | 'direction';
         }
     ): Promise<Profile> {
-        // FIXME : auth.SignUp authenticate the user as the one newly created
-        // Créer l'utilisateur Auth (avec trigger qui crée le profil)
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: profileData.email,
-            password: profileData.password,
-            options: {
-                data: {
-                    nom: profileData.nom,
-                    prenom: profileData.prenom,
-                    role: profileData.role
-                }
+        // data is the newly creatd profile
+        const { data, error } = await supabase.functions.invoke('create-user', { // edge function
+            body: {
+                email: profileData.email,
+                password: profileData.password,
+                nom: profileData.nom,
+                prenom: profileData.prenom,
+                role: profileData.role,
             }
         });
 
-        if (authError || !authData.user) {
-            throw new Error(`Error creating the user: ${authError?.message}` );
-        }
-
-        // Récupérer le profil qui vient d'être créé par le trigger
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
-
-        if (profileError) {
-            throw new Error(`Error fetching the user: ${profileError.message}` );
-        }
-
-        return profile;
+        if (error) throw new Error(`Erreur création utilisateur: ${error.message}`);
+        return data;
     }
 
     /**
@@ -124,31 +107,12 @@ class ProfileService {
      * @param userId - the id of the user (works because the field id of profile is a foreign key of auth.user uid)
      * @param newPassword - the new password setted by the admin
      */
-    async updateUserPassword(userId: string, newPassword: string): Promise<Profile> {
-        // FIXME : doesn't work because auth.admin necessitate the service_role key
-        // Utiliser l'Admin API
-        const { data: authData, error: authError } = await supabase.auth.admin.updateUserById(
-            userId,
-            { password: newPassword }
-        );
+    async updateUserPassword(userId: string, newPassword: string): Promise<void> {
+        const { error } = await supabase.functions.invoke('update-user-password', {
+            body: { userId, newPassword }
+        });
 
-        if (authError || !authData.user) {
-            throw new Error(`Error updating the password: ${authError?.message}` );
-        }
-
-        // Récupérer le profil mis à jour
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .is('deleted_at', null)
-            .maybeSingle();
-
-        if (profileError) {
-            throw new Error(`Error fetching the user: ${profileError.message}` );
-        }
-
-        return profile;
+        if (error) throw new Error(`Erreur mise à jour mot de passe: ${error.message}`);
     }
 
     /** For users looking to update their own password

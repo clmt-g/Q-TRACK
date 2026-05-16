@@ -122,7 +122,7 @@ export function useProfile(userId: string | undefined) {
             setLoading(true);
             setError(null);
 
-            return await profileService.updateUserPassword(userId, newPassword);
+            await profileService.updateUserPassword(userId, newPassword);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Erreur inconnue';
             setError(message);
