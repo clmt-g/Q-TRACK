@@ -1,12 +1,12 @@
 // app/index.tsx
 import { Redirect } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { globalStyles, colors } from '@/styles/theme';
 import ErrorState from "@/components/error";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function Index() {
-    const { isLoggedIn, isLoading, error } = useAuth();
+    const { isLoggedIn, isLoading, error } = useEffectiveAuth();
 
     // Afficher un loader pendant la vérification
     if (isLoading) {

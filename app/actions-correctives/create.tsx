@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
 import { useActionCorrective } from '@/hooks/useActionCorrective';
 import { useIncident } from '@/hooks/useIncident';
-import { useAuth } from '@/contexts/AuthContext';
 import { useState, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -12,10 +11,11 @@ import LoadingState from '@/components/loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { STATUTS } from '@/constants/actionCorrectives';
 import ErrorState from "@/components/error";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function ActionCorrectiveCreateScreen() {
     const router = useRouter();
-    const { session, error: errorAuth, isLoading: loadingAuth } = useAuth();
+    const { session, error: errorAuth, isLoading: loadingAuth } = useEffectiveAuth();
     const { createActionCorrective, loading: loadingAction, error: errorAction } = useActionCorrective();
     const { incidents, loadIncidents, loading: loadingIncident, error: errorIncident } = useIncident();
     const { id } = useLocalSearchParams();

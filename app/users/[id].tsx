@@ -8,14 +8,14 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import { getRoleConfig } from '@/utils/users';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function ProfileDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { profile, loading: loadingProfile, error: errorProfile, loadProfile } = useProfile(id as string);
-    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
 
     if (loadingProfile || loadingAuth) {
         return <LoadingState message="Chargement du profil..." />;

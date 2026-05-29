@@ -9,7 +9,7 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
 import { formatDateTime } from '@/utils/date';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 // === Constants for the filters ===
 // Statuts disponibles
@@ -33,7 +33,7 @@ export default function IncidentsScreen() {
     const router = useRouter();
     const { incidents, loading: loadingIncident, error: errorIncident, loadIncidents, deleteIncident } = useIncident();
     const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
-    const { role, session, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, session, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreType, setFiltreType] = useState<number | 'tous'>('tous');

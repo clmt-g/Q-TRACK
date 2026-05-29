@@ -4,12 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
-import { useAuth } from '@/contexts/AuthContext';
 import {useEffect} from "react";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function TabsLayout() {
     const router = useRouter();
-    const { isLoggedIn, role } = useAuth();
+    const { isLoggedIn, role } = useEffectiveAuth();
     const insets = useSafeAreaInsets();
 
     // redirect to the login page if not authenticated

@@ -9,15 +9,15 @@ import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { getStatutStyle } from '@/utils/incidents';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {useAuth} from "@/contexts/AuthContext";
 import {usePdf} from "@/hooks/usePdf";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function IncidentDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { incident, loadIncident, loading: loadingIncident, error: errorIncident } = useIncident();
-    const { role, session, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, session, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
     const { generateReport, error: errorPdf, loading: loadingPdf } = usePdf();
 
     useFocusEffect(

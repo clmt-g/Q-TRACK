@@ -4,17 +4,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
 import { useIncident } from '@/hooks/useIncident';
 import { useTypeIncident } from '@/hooks/useTypeIncident';
-import { useAuth } from '@/contexts/AuthContext';
 import { useState, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import LoadingState from '@/components/loading';
 import { STATUTS } from '@/constants/incidents';
 import ErrorState from "@/components/error";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function IncidentCreateScreen() {
     const router = useRouter();
-    const { session } = useAuth();
+    const { session } = useEffectiveAuth();
     const { createIncident, loading: loadingIncident, error: errorIncident } = useIncident();
     const { typesIncidents, loadTypesIncidents, loading: loadingTypeIncident, error: errorTypeIncident } = useTypeIncident();
 

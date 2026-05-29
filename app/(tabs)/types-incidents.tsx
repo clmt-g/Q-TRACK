@@ -7,11 +7,11 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import { formatDate } from '@/utils/date';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function TypeIncidentsScreen() {
     const router = useRouter();
-    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
     const { typesIncidents, loading: loadingTypesIncidents, error: errorTypesIncidents, loadTypesIncidents, deleteTypeIncident } = useTypeIncident();
 
     useFocusEffect(

@@ -4,16 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
-import { useAuth } from '@/contexts/AuthContext';
 import {useProfile} from "@/hooks/useProfile";
 import {useCallback} from "react";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function ProfileScreen() {
     const router = useRouter();
-    const { session, logout, error: errorAuth, isLoading: loadingAuth, role } = useAuth();
+    const { session, logout, error: errorAuth, isLoading: loadingAuth, role } = useEffectiveAuth();
     const insets = useSafeAreaInsets();
     const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
 

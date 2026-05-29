@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import {useFocusEffect, useRouter} from 'expo-router';
 import { globalStyles, colors } from '@/styles/theme';
-import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from "@/hooks/useProfile";
 import ErrorState from "@/components/error";
 import LoadingState from "@/components/loading";
@@ -12,10 +11,11 @@ import {useIncident} from "@/hooks/useIncident";
 import {useTypeIncident} from "@/hooks/useTypeIncident";
 import {getStatutStyle } from "@/utils/incidents";
 import { formatDateTime } from "@/utils/date";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { session, logout, role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { session, logout, role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
     const { profile, loadProfile, loading: loadingProfile, error: errorProfile } = useProfile(session?.user?.id);
     const { incidents, loading: loadingIncidents, error: errorIncidents, loadIncidents } = useIncident();
     const { typesIncidents, loading: loadingTypes, error: errorTypes, loadTypesIncidents } = useTypeIncident();

@@ -4,12 +4,15 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { networkService } from "@/services/NetworkService";
 import { useNetwork } from "@/hooks/useNetwork";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { ImpersonationProvider } from "@/contexts/ImpersonationContext";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 function RootLayoutNav() {
     const isConnected = useNetwork();
 
     return (
         <>
+            <ImpersonationBanner />
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="login" />
                 <Stack.Screen name="index" />
@@ -29,7 +32,9 @@ export default function RootLayout() {
 
     return (
         <AuthProvider>
-            <RootLayoutNav />
+            <ImpersonationProvider>
+                <RootLayoutNav />
+            </ImpersonationProvider>
         </AuthProvider>
     );
 }

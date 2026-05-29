@@ -10,12 +10,14 @@ import ErrorState from "@/components/error";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { formatDateTime } from '@/utils/date';
 import {getRoleBadgeStyle, getRoleLabel, getRoleIcon} from '@/utils/users';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
+import { useImpersonation } from '@/contexts/ImpersonationContext';
 
 export default function ProfilesScreen() {
     const router = useRouter();
-    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
     const {profiles, loading: loadingProfile, error: errorProfile, loadProfiles, deleteProfile} = useProfile(undefined);
+    const { startImpersonation } = useImpersonation();
 
     useFocusEffect(
         useCallback(() => {
@@ -172,6 +174,24 @@ export default function ProfilesScreen() {
                                     <MaterialIcons name="delete-outline" size={18} color="#C32D2D"/>
                                     <Text style={styles.actionButtonText}>Supprimer</Text>
                                 </TouchableOpacity>
+
+                                {profile.role !== 'admin' && (
+                                    <TouchableOpacity
+                                        style={styles.actionButton}
+                                        onPress={() => {
+                                            startImpersonation({
+                                                id: profile.id,
+                                                nom: profile.nom,
+                                                prenom: profile.prenom,
+                                                role: profile.role,
+                                            });
+                                            router.push('/(tabs)'); // redirige vers l'écran principal
+                                        }}
+                                    >
+                                        <Ionicons name="eye-outline" size={18} color="#7C3AED" />
+                                        <Text style={styles.actionButtonText}>Voir en tant que</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         )}
                     </View>

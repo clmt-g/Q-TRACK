@@ -9,13 +9,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import LoadingState from '@/components/loading';
 import ErrorState from '@/components/error';
 import PasswordInput, {isPasswordValid} from '@/components/passwordInput';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 // Détermine si on est en mode admin (update d'un autre user) ou self (update de son propre mdp)
 // En passant ?self=true dans les params on force le mode self
 export default function UpdatePasswordScreen() {
     const router = useRouter();
-    const {session} = useAuth();
+    const {session} = useEffectiveAuth();
     const {id} = useLocalSearchParams<{ id: string }>();
     const isSelf = session?.user?.id === id;
 

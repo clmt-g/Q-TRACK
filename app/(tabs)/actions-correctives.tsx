@@ -10,7 +10,7 @@ import ErrorState from '@/components/error';
 import { ActionCorrective } from '@/services/ActionCorrectiveService';
 import { getStatutConfig } from '@/utils/actionsCorrectives';
 import { formatDate } from '@/utils/date';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 // === Constants for filtres ===
 const STATUTS = [
@@ -32,7 +32,7 @@ export default function ActionsCorractivesScreen() {
     const router = useRouter();
     const { actionsCorrectives, loading: loadingActions, error: errorActions, loadActionsCorrectives, deleteActionCorrective } = useActionCorrective();
     const { profiles, loadProfiles, loading: loadingProfile, error: errorProfile } = useProfile(undefined);
-    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
 
     const [filtreStatut, setFiltreStatut] = useState('tous');
     const [filtreResponsable, setFiltreResponsable] = useState<string | 'tous'>('tous');

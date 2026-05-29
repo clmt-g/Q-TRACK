@@ -4,8 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { globalStyles, colors } from '@/styles/theme';
 import {useEffect, useState} from 'react';
 import { supabase } from '@/utils/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 import {useRouter} from "expo-router";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -24,7 +24,7 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { login, error, isLoggedIn, clearError } = useAuth();
+    const { login, error, isLoggedIn, clearError } = useEffectiveAuth();
     const router = useRouter();
 
     async function signInWithEmail() {

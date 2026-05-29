@@ -10,14 +10,14 @@ import ErrorState from '@/components/error';
 import { getStatutConfig } from '@/utils/actionsCorrectives';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getStatutStyle } from '@/utils/incidents';
-import {useAuth} from "@/contexts/AuthContext";
+import {useEffectiveAuth} from "@/hooks/useEffectiveAuth";
 
 export default function ActionCorrectiveDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { actionCorrective, loadActionCorrective, loading: loadingAction, error: errorAction } = useActionCorrective();
-    const { role, isLoading: loadingAuth, error: errorAuth } = useAuth();
+    const { role, isLoading: loadingAuth, error: errorAuth } = useEffectiveAuth();
 
     useFocusEffect(
         useCallback(() => {
