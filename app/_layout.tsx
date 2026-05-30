@@ -1,3 +1,4 @@
+// app/_layout.tsx
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -17,6 +18,8 @@ function RootLayoutNav() {
                 <Stack.Screen name="login" />
                 <Stack.Screen name="index" />
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="forgot-password" />
+                <Stack.Screen name="reset-password" />
                 <Stack.Screen name="+not-found" />
             </Stack>
             {!isConnected && <OfflineBanner />}
