@@ -46,11 +46,11 @@ export default function IncidentDetailScreen() {
      */
     const handleDownload = async () => {
         Alert.alert(
-            'Télécharger le rapport',
-            `Voulez-vous télécharger le rapport de l'incident #${incident.id_incident} ?`,
+            'Partager le rapport',
+            `Voulez-vous partager le rapport de l'incident #${incident.id_incident} ?`,
             [
                 { text: 'Annuler', style: 'cancel' },
-                { text: 'Télécharger', onPress: () => generateReport(incident.id_incident) },
+                { text: 'Partager', onPress: () => generateReport(incident.id_incident) },
             ]
         );
     };
