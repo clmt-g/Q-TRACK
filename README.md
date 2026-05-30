@@ -1,50 +1,141 @@
-# Welcome to your Expo app 👋
+# Q-Track — Guide de démarrage
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Application mobile Android de gestion qualité, développée avec Expo / React Native et Supabase.
 
-## Get started
+---
 
-1. Install dependencies
+## Prérequis
 
-   ```bash
-   npm install
-   ```
+- [Node.js](https://nodejs.org/) v18 ou supérieur
+- [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
+- [Expo Go](https://expo.dev/client) installé sur ton téléphone Android
+- Un compte [Supabase](https://supabase.com/) avec un projet configuré
+- [ngrok](https://ngrok.com/) installé sur ta machine (pour le tunnel)
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Installation
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Cloner le projet
 
 ```bash
-npm run reset-project
+git clone <url-du-repo>
+cd q-track
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Installer les dépendances
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Configurer Supabase
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Le fichier `utils/supabase.ts` est ignoré par git (`.gitignore`) et doit être recréé manuellement. Crée le fichier `utils/supabase.ts` avec le contenu suivant :
 
-## Join the community
+```ts
+import 'expo-sqlite/localStorage/install';
+import { createClient } from '@supabase/supabase-js';
 
-Join our community of developers creating universal apps.
+export const supabaseUrl = 'https://ton-projet.supabase.co';
+export const supabaseAnonKey = 'ta-clé-anon';
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        storage: localStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+    },
+});
+```
+
+> Les valeurs `supabaseUrl` et `supabaseAnonKey` se trouvent dans ton dashboard Supabase : **Project Settings → API**
+
+### 4. Configurer les variables d'environnement
+
+Crée un fichier `.env` à la racine du projet :
+
+```env
+# Dev — permet de bypasser la session de reset password en développement
+# Mettre à false uniquement pour tester le flow complet depuis un email
+EXPO_PUBLIC_DEV_SKIP_SESSION=true
+```
+
+---
+
+## Lancer le serveur de développement
+
+### Avec le tunnel ngrok (recommandé pour tester sur téléphone physique)
+
+```bash
+npx expo start --tunnel
+```
+
+Scanne ensuite le QR code avec **Expo Go** sur ton téléphone.
+
+> Le tunnel ngrok permet d'accéder au serveur depuis n'importe quel réseau, sans être sur le même Wi-Fi que ta machine.
+
+---
+
+## Configuration Supabase
+
+Dans le dashboard Supabase de ton projet, sous **Authentication → URL Configuration** :
+
+**Site URL :**
+```
+qtrack://
+```
+
+**Redirect URLs (toutes les ajouter) :**
+```
+qtrack://**
+exp://192.168.*.*:8081/**
+exp://*.exp.direct/**
+```
+
+> Le `**` est important — il accepte n'importe quel path après le scheme.
+
+---
+
+## Build APK (production)
+
+Le projet utilise EAS Build. Assure-toi d'avoir le CLI EAS installé :
+
+```bash
+npm install -g eas-cli
+eas login
+```
+
+Puis pour builder l'APK :
+
+```bash
+eas build --platform android --profile preview
+```
+
+---
+
+## Structure du projet
+
+```
+app/                  # Pages (expo-router)
+  (tabs)/             # Navigation par onglets
+  _layout.tsx         # Layout racine (navigation, providers)
+  login.tsx
+  forgot-password.tsx
+  reset-password.tsx
+components/           # Composants réutilisables
+hooks/                # Hooks React personnalisés
+services/             # Couche d'accès aux données (Supabase, etc.)
+contexts/             # Contextes React (Auth, Impersonation)
+styles/               # Thème global et couleurs
+utils/                # Utilitaires (client Supabase, etc.)
+```
+
+---
+
+## Notes
+
+- Le projet utilise **expo-router** pour la navigation — les fichiers dans `app/` correspondent directement aux routes.
+- La base de données et l'authentification sont gérées par **Supabase**.
+- Le deep linking est configuré avec le scheme `qtrack://` pour la redirection des emails (reset de mot de passe, etc.).
